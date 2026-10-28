@@ -1,0 +1,51 @@
+import express from 'express';
+import "dotenv/config";
+import receptionRouter from './src/routers/receptionRouter.js';
+import cors from "cors";
+import cookieParser from 'cookie-parser';
+import pharmRouter from './src/routers/pharmRouter.js';
+import doctorRouter from './src/routers/doctorRouter.js';
+
+
+const app= express()
+const PORT=process.env.PORT
+
+
+
+
+
+/* ---------------- MIDDLEWARES ---------------- */
+
+const allowedOrigin=["http://localhost:5173"];
+
+app.use(cors({
+    origin:allowedOrigin,
+    credentials:true
+}))
+
+app.use(cookieParser()) 
+app.use(express.json())
+
+
+
+
+
+/* ---------------- ROUTES ---------------- */
+
+app.get('/',(req,res)=>{
+    res.send("Hello,Welcome")
+})
+
+
+app.use('/api/recep',receptionRouter)
+app.use('/api/pharm',pharmRouter)
+app.use('/api/dr',doctorRouter)
+
+
+
+
+
+
+app.listen(PORT,()=>{
+    console.log(`server is runig in port ${PORT}.......`)
+})

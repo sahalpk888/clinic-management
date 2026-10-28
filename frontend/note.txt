@@ -1,0 +1,6 @@
+
+
+style={{ background: `${C.paper}E6`, borderColor: C.rule }}  -->   here E6 make it opacity less
+
+
+<div className='min-h-[calc(100vh-120px)] scroll-mt-22 bg-amber'> --->when clicked it get scrolled down by 22
