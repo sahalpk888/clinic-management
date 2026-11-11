@@ -29,11 +29,11 @@ updatedAt
  */
 
   const item:Detail[]=[
-        {name:"Prescription",path:"/pharm/view"},
-        {name:"Inventory",path:"/pharm/cart"},
-        {name:"Dashboard",path:"/pharm"},
-        {name:"Add",path:"/pharm/add"},
-        {name:"History",path:"/pharm/history"},
+        {name:"Prescription",path:"/pharmacist/view"},
+        {name:"Inventory",path:"/pharmacist/cart"},
+        {name:"Dashboard",path:"/pharmacist"},
+        {name:"Add",path:"/pharmacist/add"},
+        {name:"History",path:"/pharmacist/history"},
         
 
     ]
@@ -50,7 +50,7 @@ updatedAt
                         <div className="mt-10">
                             {
                                 item.map((pro)=>(
-                                    <NavLink to={pro.path} end={pro.path==='/pharm'} className={({isActive})=>`flex text-white items-center py-3 px-4 gap-3 ${isActive?"border-r-4 bg-teal border-primary":"hover:bg-monitor border-white"}`}>
+                                    <NavLink to={pro.path} end={pro.path==='/pharmacist'} className={({isActive})=>`flex text-white items-center py-3 px-4 gap-3 ${isActive?"border-r-4 bg-teal border-primary":"hover:bg-monitor border-white"}`}>
                                         <p>{pro.name}</p>
                                     </NavLink>
                                 ))

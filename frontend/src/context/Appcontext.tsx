@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState} from "react";
 import type { ReactNode } from "react";
 import { useNavigate, type NavigateFunction } from "react-router-dom";
-import type { Alldetails, PharmMedicine } from "../types/types";
+import type { Alldetails, AuthResponse, PharmMedicine } from "../types/types";
 import api from "../api/api";
+import type { Owner } from "../types/owner";
 
 
 
@@ -14,11 +15,11 @@ interface ConsultDetail{
 }
 interface AppContextType {
 
-  user: string | null;
-  setUser: React.Dispatch<React.SetStateAction<string | null>>;
+  //user: string | null;
+  //setUser: React.Dispatch<React.SetStateAction<string | null>>;
 
-  token: string;
-  setToken: React.Dispatch<React.SetStateAction<string>>;
+  //token: string;
+  //setToken: React.Dispatch<React.SetStateAction<string>>;
 
   navigate: NavigateFunction;
 
@@ -37,6 +38,13 @@ interface AppContextType {
  medicineDetails: PharmMedicine | null;
  setMedicineDetails: React.Dispatch<React.SetStateAction<PharmMedicine | null>>;
 
+ owner:Owner | null;
+ setOwner:React.Dispatch<React.SetStateAction<Owner | null>>;
+ authLoading: boolean;
+ registerClinic:(data:FormData)=>Promise<void>;   ///here FormData is built-in JavaScript Web API class that it recieve as formdata
+ logout: ()=>void
+ registerStaff:(data:FormData)=>Promise<void>;
+
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -50,8 +58,8 @@ export const AppContextProvider = ({
 }) => {
 
 
-  const [user, setUser] = useState<string | null>(null);
-  const [token, setToken] = useState("hello sahal");
+  //const [user, setUser] = useState<string | null>(null);
+  //const [token, setToken] = useState("hello sahal");
   const[consultDetails,setConsultDetails]=useState<ConsultDetail>({
     content:"",
     date:null
@@ -60,11 +68,51 @@ export const AppContextProvider = ({
    const [allDetails, setAllDetails] = useState<Alldetails | null>(null);
    const[medicineDetails,setMedicineDetails]=useState<PharmMedicine | null>(null);
 
+   const[owner,setOwner]=useState<Owner | null>(null);
+   const [authLoading, setAuthLoading] = useState(true);
 
 
-   /* ----------------------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------------------- */
+   
+   
+  // Register clinic
+   const registerClinic=async(data:FormData):Promise<void> =>{
+          const resp=await api.post<AuthResponse>('/api/clinic/register',data)
+          console.log(resp)
+   } 
+   
+   
+   const registerStaff=async(data:FormData):Promise<void>=>{
+          const reponse=await api.post<AuthResponse>('api/clinic/registerstaff',data)
+          console.log(reponse)
+    }
 
-    
+   useEffect(()=>{
+
+    const checkAuth=async()=>{
+      try{
+
+        const res=await api.get('api/clinic/me');
+         setOwner(res.data.user)
+
+
+      }catch(err){
+        console.log(err);
+        setOwner(null);
+      }finally{
+         setAuthLoading(false);
+      }
+    }
+
+    checkAuth()
+
+   },[])
+
+    // Logout
+    const logout = () => {
+      //setAccessToken(null);
+      setOwner(null);
+    };
 
 
 
@@ -79,10 +127,10 @@ export const AppContextProvider = ({
   const navigate =useNavigate()
 
   const value = {
-    user,
-    setUser,
-    token,
-    setToken,
+    //user,
+    //setUser,
+    //token,
+    //setToken,
     navigate,
     consultDetails,
     setConsultDetails,
@@ -91,7 +139,14 @@ export const AppContextProvider = ({
     setAllDetails,
     api,
     medicineDetails,
-    setMedicineDetails
+    setMedicineDetails,
+
+    owner,
+    setOwner,
+    authLoading,
+    registerClinic,
+    logout,
+    registerStaff
   };
 
 

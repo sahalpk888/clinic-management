@@ -10,10 +10,10 @@ interface Detail{
 const Sidebar = () => {
 
     const item:Detail[]=[
-        {name:"Add Patient ",path:"/dr/add"},
-        {name:"Dashboard",path:"/dr"},
-        {name:"Patient History",path:"/dr/history"},
-        {name:"Appointment",path:"/dr/appoint"},
+        {name:"Add Patient ",path:"/doctor/add"},
+        {name:"Dashboard",path:"/doctor"},
+        {name:"Patient History",path:"/doctor/history"},
+        {name:"Appointment",path:"/doctor/appoint"},
 
     ]
 
@@ -27,7 +27,7 @@ const Sidebar = () => {
             <div className="mt-10">
                 {
                     item.map((pro)=>(
-                        <NavLink to={pro.path} end={pro.path==='/dr'} className={({isActive})=>`flex text-white items-center py-3 px-4 gap-3 ${isActive?"border-r-4 bg-teal border-primary":"hover:bg-monitor border-white"}`}>
+                        <NavLink to={pro.path} end={pro.path==='/doctor'} className={({isActive})=>`flex text-white items-center py-3 px-4 gap-3 ${isActive?"border-r-4 bg-teal border-primary":"hover:bg-monitor border-white"}`}>
                             <p>{pro.name}</p>
                         </NavLink>
                     ))

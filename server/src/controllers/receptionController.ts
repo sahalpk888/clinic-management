@@ -12,7 +12,10 @@ export const register_patient=async(req:Request,res:Response)=>{
 
   try{
     
-      const {patient}=req.body
+      const {patient}=req.body;
+      const user=req.user!.clinicId
+
+      
    
    
 
@@ -55,7 +58,7 @@ export const register_patient=async(req:Request,res:Response)=>{
 
 
    // step-2 service                         
-   const data=await registerPatientService(result.data)
+   const data=await registerPatientService(result.data,user)
 
    return res.status(201).json({
       success: true,
@@ -89,7 +92,9 @@ export const reception_search=async(req:Request,res:Response)=>{
   try{
 
     const parsed= exisitingPatient.safeParse(req.query);
+    const user=req.user!.clinicId
     //console.log(req.query)
+
 
     if(!parsed.success){
       return res.status(400).json({
@@ -99,7 +104,7 @@ export const reception_search=async(req:Request,res:Response)=>{
     }
 
 
-    const patientDetails=await exisitingPatientService(parsed.data.q)   /* here data.q beacuse parsed comes after validation..so zod give data inside data like:{sucess:true,data:{....}} */
+    const patientDetails=await exisitingPatientService(parsed.data.q,user)   /* here data.q beacuse parsed comes after validation..so zod give data inside data like:{sucess:true,data:{....}} */
 
     res.status(200).json({
       success:true,
@@ -123,6 +128,7 @@ export const reception_booking=async(req:Request,res:Response)=>{
 
   try{
     const{patientId,patient,bookingDate}=req.body;
+     const user=req.user!.clinicId
 
     if(!bookingDate){
       return res.status(400).json({
@@ -133,7 +139,7 @@ export const reception_booking=async(req:Request,res:Response)=>{
 
 
     if(patient){
-      const patientBooking=await bookingPatient(patient,bookingDate);
+      const patientBooking=await bookingPatient(patient,bookingDate,user);
 
       return res.status(201).json({
             message:"Patient Regstered and booked",
@@ -144,7 +150,7 @@ export const reception_booking=async(req:Request,res:Response)=>{
 
 
     if(patientId){
-      const booking=await existingBooking(patientId,bookingDate)
+      const booking=await existingBooking(patientId,bookingDate,user)
 
       return res.status(201).json({
         message:"Patient booked",
@@ -170,8 +176,9 @@ export const reception_booking=async(req:Request,res:Response)=>{
 export const reception_view=async(req:Request,res:Response)=>{
 
   try{
-
-    const response_value=await receptionView() ;
+    
+     const user=req.user!.clinicId
+    const response_value=await receptionView(user) ;
 
 
     return res.status(200).json({
@@ -196,8 +203,10 @@ export const reception_patientHitory=async(req:Request,res:Response)=>{
     const page=Number(req.query.page ?? 1);
     const search= typeof req.query.search === "string" ? req.query.search : "";
 
+    const user=req.user!.clinicId
 
-    const resultHistory =await reception_HistoryofPatient({page,search})
+
+    const resultHistory =await reception_HistoryofPatient({page,search},user)
     
 
     res.status(200).json(resultHistory)
@@ -222,10 +231,12 @@ export const reception_patientHitory=async(req:Request,res:Response)=>{
 export const reception_checkAppoint=async(req:Request,res:Response)=>{
 
   try{
+       
+    const user=req.user!.clinicId
 
     const appoint_date=req.query.appointdate;
 
-    const Already_times=await already_bookedTimes(appoint_date)
+    const Already_times=await already_bookedTimes(appoint_date,user)
 
      return res.status(200).json({
       bookedTimes: Already_times,
@@ -245,16 +256,19 @@ export const reception_bookappoint=async(req:Request,res:Response)=>{
   try{
     //console.log(req.body);
 
-    let booking_ok
+     const user=req.user!.clinicId
+
+    let booking_ok;
+
 
     const {patientId,singlePerson,timeAppoint,selectedDay}=req.body;
 
 
     if(patientId){
-       booking_ok=await old_booking(patientId,timeAppoint,selectedDay)
+       booking_ok=await old_booking(patientId,timeAppoint,selectedDay,user)
 
     }else{
-       booking_ok=await new_booking(singlePerson,timeAppoint,selectedDay)
+       booking_ok=await new_booking(singlePerson,timeAppoint,selectedDay,user)
 
     }
 

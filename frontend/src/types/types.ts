@@ -1,3 +1,4 @@
+import type { Owner } from "./owner";
 
 
 
@@ -80,5 +81,13 @@ export interface PharmMedicine{
     gst:number,
     hsn:string
 
+}
+
+
+
+
+export interface AuthResponse{
+  message:string;
+  user:Owner
 }
 

@@ -1,4 +1,4 @@
-import { and, count, countDistinct, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
+import { and, asc, count, countDistinct, desc, eq, gte, ilike, isNotNull, lt, or, sql } from "drizzle-orm";
 import { db } from "../db/db.js";
 import { visit } from "../db/schema/visit.js";
 import { patient } from "../db/schema/patient.js";
@@ -7,6 +7,9 @@ import { prescriptionSchema } from "../db/schema/prescription.js";
 import { pharmMedicine } from "../db/schema/pharmMedicine.js";
 import { crudPolicy } from "drizzle-orm/neon";
 import { pharmacyBill } from "../db/schema/pharmacyBill.js";
+import { TZDate } from "@date-fns/tz";
+import { addDays, format, startOfDay } from "date-fns";
+import { clinic } from "../db/schema/clinic.js";
 
 
 
@@ -14,7 +17,7 @@ import { pharmacyBill } from "../db/schema/pharmacyBill.js";
 
 
 
-export const docotor_AppointService=async(date:string)=>{
+export const docotor_AppointService=async(date:string,clinicIdData:string)=>{
 
 
     //console.log(date);
@@ -34,7 +37,8 @@ export const docotor_AppointService=async(date:string)=>{
                    .where(
                       and(
                         eq(visit.date, date),
-                        isNotNull(visit.appoitTime)   /* excludes visits where appoit_time is NULL. */
+                        isNotNull(visit.appoitTime),   /* excludes visits where appoit_time is NULL. */
+                        eq(visit.clinicId,clinicIdData)
                       )
                     );
    
@@ -45,7 +49,7 @@ export const docotor_AppointService=async(date:string)=>{
 
 
 
-export const doctor_consultService=async(year:number,month:number)=>{
+export const doctor_consultService=async(year:number,month:number,clinicIdData:string)=>{
 
   
   const startDate= `${year}-${String(month).padStart(2,"0")}-01`    /* padstart used beacsue if frontend send 8 ==>(convert to) 08..like be two digit..if send 08 then ==>08 itself.  */
@@ -103,9 +107,12 @@ export const doctor_consultService=async(year:number,month:number)=>{
                     })
                     .from(visit)
                     .where(         
-                      sql `${visit.date} >= ${startDate} 
+                      and(
+                        sql `${visit.date} >= ${startDate} 
                             AND ${visit.date} < ${endDate}
-                            AND ${visit.status}='waiting' `
+                            AND ${visit.status}='waiting' `,
+                        eq(visit.clinicId,clinicIdData)
+                      )
                     )
                     /* 
                     .where(
@@ -125,7 +132,7 @@ export const doctor_consultService=async(year:number,month:number)=>{
 
 
 
-export const doctor_totalService=async(date:string)=>{
+export const doctor_totalService=async(date:string,clinicIdData:string)=>{
 
   const ok=await db
                  .select({
@@ -140,13 +147,17 @@ export const doctor_totalService=async(date:string)=>{
                  })
                  .from(visit)
                  .innerJoin(patient,eq(visit.patientId,patient.id))
-                 .where(eq(visit.date, date));
+                 .where(and(
+                  eq(visit.date, date),
+                  eq(visit.clinicId,clinicIdData)
+                 ))
+                 .orderBy(desc(visit.token));
    
   return ok
 }
 
 
-export const doctor_tokenService=async(token:number)=>{
+export const doctor_tokenService=async(token:number,clinicIdData:string)=>{
  
 
   const istoday=new Date().toISOString().split("T")[0];
@@ -165,7 +176,8 @@ export const doctor_tokenService=async(token:number)=>{
                     .where(
                       and(
                         eq(visit.date,istoday),
-                        eq(visit.token,token)
+                        eq(visit.token,token),
+                        eq(patient.clinicId,clinicIdData)
                       )
     );
 
@@ -181,7 +193,7 @@ export const doctor_tokenService=async(token:number)=>{
 
 
 
-export const getmedicinelistService=async()=>{
+export const getmedicinelistService=async(clinicIdData:string)=>{
 
 
   const hello=await db
@@ -190,6 +202,9 @@ export const getmedicinelistService=async()=>{
                       name:pharmMedicine.name
                     })
                     .from(pharmMedicine)
+                    .where(
+                      eq(pharmMedicine.clinicId,clinicIdData)
+                    )
 
   return hello
 
@@ -215,7 +230,7 @@ interface prescriptionInput{
   patientId:string
 }
 
-export const doctor_prescriptionService=async(data:prescriptionInput)=>{
+export const doctor_prescriptionService=async(data:prescriptionInput,clinicIdData:string)=>{
 
 
     const{condition,medicines,patientId}=data;
@@ -230,6 +245,7 @@ export const doctor_prescriptionService=async(data:prescriptionInput)=>{
                                 .insert(consultationSchema)
                                 .values({
                                   diagnosis:condition,
+                                  clinicId:clinicIdData,
                                   patientId
                                 }).returning()
 
@@ -248,7 +264,10 @@ export const doctor_prescriptionService=async(data:prescriptionInput)=>{
                                         const [medicineData]=await psx
                                                                .select({priceperunit:pharmMedicine.priceperunit})
                                                                .from(pharmMedicine)
-                                                               .where(eq(pharmMedicine.id,pop.medicineid))
+                                                               .where(and(
+                                                                eq(pharmMedicine.id,pop.medicineid),
+                                                                eq(pharmMedicine.clinicId,clinicIdData)
+                                                               ))
                                                                .limit(1)
 
                                           const amount=Number(medicineData.priceperunit)* qty;
@@ -260,7 +279,8 @@ export const doctor_prescriptionService=async(data:prescriptionInput)=>{
                                         times:pop.time,
                                         duration:Number(pop.duration),
                                         qty:qty,
-                                        amount:amount
+                                        amount:amount,
+                                        clinicId:clinicIdData
                                         
                                         }
                                    })
@@ -316,8 +336,10 @@ export const doctor_prescriptionService=async(data:prescriptionInput)=>{
                         .insert(pharmacyBill)
                         .values({
                           billId:bill_id,
-                          consultId:consultionList.id
-                        }).returning()
+                          consultId:consultionList.id,
+                          clinicId:clinicIdData
+                        })
+                        .returning()
                               
 
           return{
@@ -329,10 +351,167 @@ export const doctor_prescriptionService=async(data:prescriptionInput)=>{
 
     })
 
+}
 
 
+export const doctor_getdetailsService=async(date:string,clinicIdData:string)=>{
+
+   const [completecount] = await db
+                       .select({complete:count()})
+                       .from(pharmacyBill)
+                       .innerJoin(consultationSchema,eq(consultationSchema.id,pharmacyBill.consultId))
+                       .innerJoin(patient,eq(patient.id,consultationSchema.patientId))
+                       .innerJoin(visit,eq(visit.patientId,patient.id))
+                       .where(and(
+                          eq(visit.date,date),
+                          eq(pharmacyBill.status,"completed"),
+                          isNotNull(visit.appoitTime),
+                          eq(pharmacyBill.clinicId,clinicIdData)
+                       ))
+
+    const[totalcount]=await db 
+                           .select({total:count()})
+                           .from(visit)
+                           .where(and(
+                               eq(visit.date, date),
+                               isNotNull(visit.appoitTime),
+                               eq(visit.clinicId,clinicIdData)
+                           ))
+
+
+
+        return {
+          totalcount,
+          completecount
+        }
+
+}
+
+
+
+export const doctor_dashService=async(clinicIdData:string)=>{
+
+  const TIMEZONE="Asia/Kolkata"
+
+  const today=TZDate.tz(TIMEZONE)
+
+  const formatteddate=format(today,"yyyy-MM-dd");
+  const start = startOfDay(today);  //its date-fns ...we get the first date from 00:00:00
+  const end = addDays(start, 1); //date-fns ....it menas start is monday means (start,1) means tuesday........here this is next day but we use it LT so it exclude the nextdat giving the previous day full
+
+
+  const [totalpatient]=await db    /// gets patient count
+                           .select({
+                            total:count()
+                           })
+                           .from(consultationSchema)
+                           .where(
+                            and(
+                              gte(consultationSchema.createdAt,start),
+                              lt(consultationSchema.createdAt,end),
+                              eq(consultationSchema.clinicId,clinicIdData)
+                            )
+                           )
+  /* --------------------------------------------------- */
+
+  const ageResult=await db   /// gets {age:22,age:32}
+                  .select({
+                    ageOld:patient.age
+                  })
+                  .from(patient)
+                  .innerJoin(consultationSchema,eq(consultationSchema.patientId,patient.id))
+                  .where(
+                    and(
+                      gte(consultationSchema.createdAt,start),
+                      lt(consultationSchema.createdAt,end),
+                      eq(patient.clinicId,clinicIdData)
+                    )
+                  )
+
+    const ageGroup={
+       "0-18":0,
+       "19-30":0,
+       "31-45":0,
+       "46-59":0,
+       "60+":0
+
+    }
+
+    ageResult.forEach((itm)=>{
+          const patientAge=Number(itm.ageOld)
+
+          if(patientAge>=0 && patientAge<=18){
+            ageGroup["0-18"]++
+          }
+          else if(patientAge<=30 ){
+            ageGroup["19-30"]++
+          }else if(patientAge<=45){
+            ageGroup["31-45"]++
+          }else if(patientAge<=59){
+            ageGroup["46-59"]++
+          }else if(patientAge>59){
+            ageGroup["60+"]++
+          }
+    })
+
+    /* const ageChart = Object.entries(ageGroup).map(([group, count]) => ({     ///method-1
+      group,
+      count,
+    })); */
+
+    const ageChart = [                                              ///method-2 without this it will be in shuffle order
+      { group: "0-18", count: ageGroup["0-18"] },
+      { group: "19-30", count: ageGroup["19-30"] },
+      { group: "31-45", count: ageGroup["31-45"] },
+      { group: "46-59", count: ageGroup["46-59"] },
+      { group: "60+", count: ageGroup["60+"] },
+    ];
+
+
+
+    /* --------------------------------------------------- */
+
+    const gender=await db
+                       .select({
+                        gender:patient.gender
+                       })
+                       .from(patient)
+                       .innerJoin(consultationSchema,eq(consultationSchema.patientId,patient.id))
+                        .where(
+                          and(
+                            gte(consultationSchema.createdAt,start),
+                            lt(consultationSchema.createdAt,end),
+                            eq(patient.clinicId,clinicIdData)
+                          )
+                        )
+
+
+      const genderGroup={
+        male:0,
+        female:0
+      }
+
+
+
+      gender.forEach((gnx)=>{
+        if(gnx.gender === "male"){
+          genderGroup["male"]++
+        }else{
+          genderGroup["female"]++
+        }
+      })
 
   
+
+  /* --------------------------------------------------- */
+
+  return{
+    totalpatient,
+    ageChart,
+    genderGroup
+  }
+  
+
 }
 
 

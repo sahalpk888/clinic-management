@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import type { PharmMedicine } from '../../types/types';
 import Barcode from "react-barcode";
 import { Cross, Delete, PlusIcon, RemoveFormatting } from 'lucide-react';
@@ -7,12 +7,32 @@ import api from '../../api/api';
 
 
 type MedicineTemp = {
-  id: string;
+  barcodeid: string;
   name: string;
-  dose: string;
+  dosageform: string;
   expiry: string;
-  batch: string;
+  batchnumber: string;
 };
+
+interface medicineDetails{
+     barcodeid: string
+    batchnumber:string
+    dosageform:string
+    expiry: string
+    gst: number
+    hsn: string
+    id: string
+    mfg: string
+    name:string
+    priceperunit: number
+    purchaseprice: number
+    sellingprice: number
+    shelf: string
+    stock: number
+    strength: number
+    strengthunit: string
+    totalunit: number
+}
 
 
 
@@ -66,7 +86,9 @@ const Add = () => {
 
     })
 
-    const items=[
+    const [items,setItems]=useState<medicineDetails[]>([])
+
+    /* const items=[
         {id:"123",name:"Paracetomol",dose:"650",expiry:"22/2/2029",batch:"PTK-112"},
         {id:"433",name:"dolo",dose:"500",expiry:"22/2/2026",batch:"PTK-112"},
         {id:"763",name:"cetrizine",dose:"750",expiry:"22/2/2039",batch:"PTK-112"},
@@ -74,7 +96,7 @@ const Add = () => {
         {id:"432",name:"vanehud",dose:"250",expiry:"22/2/2026",batch:"PTK-112"},
         {id:"943",name:"jpisnikm",dose:"650",expiry:"22/2/2027",batch:"PTK-112"},
         {id:"653",name:"ghdysbj",dose:"640",expiry:"22/2/2028",batch:"PTK-112"}
-    ]
+    ] */
 
     const [activeTab, setActiveTab] = useState("add");
     const[search,setSearch]=useState("")
@@ -172,6 +194,32 @@ const Add = () => {
 
     }
 
+
+    useEffect(()=>{
+
+        const medicine_view=async()=>{
+        try{
+
+            const res=await api.get('/api/pharm/getmedicine');
+            console.log(res);
+            setItems(res.data.result);
+    
+
+
+        }catch(err){
+            console.log(err)
+        }
+        }
+
+        medicine_view()
+
+    
+
+    },[])
+
+
+
+
     const barcodeFunc=(pop:MedicineTemp)=>{
        return(
             <>
@@ -179,11 +227,11 @@ const Add = () => {
                     {pop.name}
                   </div>
                   <div className="mt-[0.5mm] text-[9px] leading-tight">
-                    {pop.dose}
+                    {pop.dosageform}
                   </div>
-                  <div className="mt-[1mm] flex items-center justify-center">
+                  <div className="mt-[1mm] flex items-center justify-center max-w-40">
                     <Barcode
-                      value={pop.id}
+                      value={pop.barcodeid}
                       format="CODE128"
                       width={2.4}
                       height={35}
@@ -193,7 +241,7 @@ const Add = () => {
                     />
                   </div>
                   <div className="mt-auto flex w-full  justify-between text-[10px] leading-none">
-                    <span>Batch: {pop.batch}</span>
+                    <span>Batch: {pop.batchnumber}</span>
                     <span>Expiry: {pop.expiry}</span>
                     
                   </div>
@@ -397,7 +445,7 @@ const Add = () => {
                                     <div className='flex-1 gap-5'>
                                         
                                         <p>Name: {pro.name}</p>
-                                        <p>Dose: {pro.dose}</p>
+                                        <p>Dose: {pro.dosageform}</p>
                                         <p>{pro.expiry}</p>
                                     </div>
                                     

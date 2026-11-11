@@ -1,5 +1,6 @@
 
-import { date, integer, pgEnum, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
+import { date, integer, pgEnum, pgTable, unique, uuid, varchar } from "drizzle-orm/pg-core";
+import { clinic } from "./clinic.js";
 
 
 
@@ -40,7 +41,8 @@ export const dosageFormEnum = pgEnum("dosage_form", [
 export const pharmMedicine=pgTable("medicine",{
 
     id:uuid("id").defaultRandom().primaryKey(),
-     name:varchar("name").notNull(),
+    clinicId:uuid("clinic_id").notNull().references(()=>clinic.id),
+    name:varchar("name").notNull(),
     strength:integer("strength").notNull(),
     strengthunit:strengthUnitEnum("strengthunit").notNull(),
     barcodeid:varchar("barcodeid").notNull(),
@@ -60,4 +62,7 @@ export const pharmMedicine=pgTable("medicine",{
 
     
 
-})
+},(table) => ({
+  clinicMedicineUnique: unique("clinic_medicine_unique")
+    .on(table.clinicId, table.id),
+}))

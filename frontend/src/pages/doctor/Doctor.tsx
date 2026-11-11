@@ -124,13 +124,27 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
 
                     //onNext({patientDetails:patient,medicineDetails:medicines,condition});      ///sending data to app.tsx
 
-                    console.log(condition)
-                    console.log(medicines);
+                    //console.log(condition)
+                    //console.log(medicines);
 
                     try{
 
                       const resp=await api.post('/api/dr/patientprescription',{condition,medicines,patientId:patient.id});
-                      console.log(resp)
+                      console.log(resp);
+                      if(resp.data.success){
+                              setPatient({
+                                    name:"",
+                                    age:"",
+                                    gender:"",
+                                    token:"",
+                                    id:""
+                              });
+
+                              setCondition("");
+
+                              setMedicines([])
+
+                      }
 
                     }catch(err){
                       console.log(err)

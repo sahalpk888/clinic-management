@@ -5,6 +5,7 @@ import cors from "cors";
 import cookieParser from 'cookie-parser';
 import pharmRouter from './src/routers/pharmRouter.js';
 import doctorRouter from './src/routers/doctorRouter.js';
+import clinicRouter from './src/routers/clinicRouter.js';
 
 
 const app= express()
@@ -40,6 +41,7 @@ app.get('/',(req,res)=>{
 app.use('/api/recep',receptionRouter)
 app.use('/api/pharm',pharmRouter)
 app.use('/api/dr',doctorRouter)
+app.use('/api/clinic',clinicRouter)
 
 
 
