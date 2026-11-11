@@ -1,23 +1,25 @@
 
 import express from 'express'
 import { reception_bookappoint, reception_booking, reception_checkAppoint, reception_patientHitory, reception_search, reception_view, register_patient } from '../controllers/receptionController.js'
+import { authenticate } from '../middlewares/isAuth.js'
+import { authorize } from '../middlewares/authorize.js'
 
 const receptionRouter=express.Router()
 
 
-  receptionRouter.post('/register',register_patient)
+  receptionRouter.post('/register',authenticate,authorize("receptionist"),register_patient)
 
-  receptionRouter.get('/search',reception_search)
+  receptionRouter.get('/search',authenticate,authorize("receptionist"),reception_search)
 
-  receptionRouter.post('/bookingregister',reception_booking)
+  receptionRouter.post('/bookingregister',authenticate,authorize("receptionist"),reception_booking)
 
-  receptionRouter.get('/tokenview',reception_view)
+  receptionRouter.get('/tokenview',authenticate,authorize("receptionist"),reception_view)
 
-  receptionRouter.get('/patienthistory',reception_patientHitory)
+  receptionRouter.get('/patienthistory',authenticate,authorize("receptionist","admin","doctor"),reception_patientHitory)
 
-  receptionRouter.get('/checkappoint',reception_checkAppoint);
+  receptionRouter.get('/checkappoint',authenticate,authorize("receptionist"),reception_checkAppoint);
 
-  receptionRouter.post('/bookappoint',reception_bookappoint)
+  receptionRouter.post('/bookappoint',authenticate,authorize("receptionist"),reception_bookappoint)
 
 
 

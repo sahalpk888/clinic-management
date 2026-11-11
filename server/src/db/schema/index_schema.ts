@@ -8,7 +8,12 @@ import { pharmMedicine,strengthUnitEnum, dosageFormEnum } from "./pharmMedicine.
 import { consultationSchema } from "./consultation.js";
 import { prescriptionSchema } from "./prescription.js";
 import { pharmacyBill } from "./pharmacyBill.js";
-
+import { pharmacyPaymentMethod } from "./pharmacyPayment.js";
+import { clinic } from "./clinic.js";
+import { clinicPolicy } from "./clinicPolicy.js";
+import { roleEnum } from "./employee.js";
+import { employee } from "./employee.js";
+import { employeeDetails } from "./employeeDetails.js";
 
 
 export {                  /* becasue in drizzle.config.ts we calling only index_schema.ts so other all schema need to be export  */
@@ -21,7 +26,14 @@ export {                  /* becasue in drizzle.config.ts we calling only index_
    dosageFormEnum,     /* must to inclcude for enu */
     consultationSchema,
     prescriptionSchema,
-    pharmacyBill
+    pharmacyBill,
+    pharmacyPaymentMethod,
+    clinic,
+    clinicPolicy,
+    roleEnum,
+    employee,
+    employeeDetails
+    
     
     
     

@@ -62,7 +62,7 @@ const Consult = () => {
               }
             })
 
-            //console.log(resp);
+            console.log(resp);
             setPatient(resp.data.result)
 
           }catch(err){
@@ -95,7 +95,7 @@ const Consult = () => {
               isToday === formattedDate &&(
                 <div className="w-30 h-10 bg-primary rounded-lg flex text-center items-center justify-center font-semibold ml-20 mt-20">
                     {/* <h1>{consultDetails.date?.toDateString()}</h1> */}
-                    <Plus/><button className="cursor-pointer" onClick={()=>navigate('/doctor')}>Add Patient</button>
+                    <Plus/><button className="cursor-pointer" onClick={()=>navigate('/doctorpage')}>Add Patient</button>
                 </div>
               )
              }

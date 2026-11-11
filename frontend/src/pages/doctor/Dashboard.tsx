@@ -1,12 +1,13 @@
 
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import api from '../../api/api'
 
 
 
 interface SummaryIN{
   label:string,
-  value:string
+  value:number
 }
 
 interface Chartinfo{
@@ -15,6 +16,23 @@ interface Chartinfo{
 }
 
 const Dashboard = () => {
+
+  const[totalPatient,setTotalPatient]=useState(0)
+  const [gender,setGender]=useState({
+    male:0,
+    female:0
+  })
+  const genderData=[
+     {name:"Male",amount:gender.male},
+     {name:"Female",amount:gender.female},
+  ]
+  const [ageData,setAgeData]=useState([
+    { name: "0-18", count: 0 },
+    { name: "19-30", count: 0 },
+    { name: "31-45", count: 0 },
+    { name: "46-59", count: 0 },
+    { name: "60+", count: 0 },
+  ]);
 
 
   const items:Chartinfo[]=[
@@ -25,13 +43,6 @@ const Dashboard = () => {
     {name:"headache",amount:11},
   ]
 
-  const ageData = [
-  { name: "0-18", count: 5 },
-  { name: "19-30", count: 40 },
-  { name: "31-45", count: 55 },
-  { name: "46-60", count: 35 },
-  { name: "60+", count: 20 },
-];
 
 const COLORS = [
   '#4f46e5',
@@ -41,11 +52,7 @@ const COLORS = [
   '#ef4444',
 ]
 
-const genderData=[
-  {name:"male",amount:45},
-  {name:"female",amount:21},
 
-]
 
 const topmedicine=[   
     { name: 'Paracetamol', sold: 86 },
@@ -99,12 +106,33 @@ const topmedicine=[
           ))
         }
       </div>
-
      )
-
-
-
   }
+
+  useEffect(()=>{
+
+    const hello=async()=>{
+      try{
+        const resp=await api.get('/api/dr/dashdoctor')
+        console.log(resp)
+        setTotalPatient(resp.data.result.totalpatient.total)
+        setGender({
+          male:resp.data.result.genderGroup.male,
+          female:resp.data.result.genderGroup.female
+        })
+        setAgeData(resp.data.result.ageChart.map((itm:any) => ({
+          name: itm.group,
+          count: Number(itm.count),
+        })))
+
+      }catch(err){
+        console.log(err)
+      }
+    }
+
+    hello()
+
+  },[])
 
 
   return (
@@ -114,7 +142,7 @@ const topmedicine=[
         <p className='m-10 text-3xl font-bold'>Patient Report :</p>
 
         <div className=''>
-          <SummaryComp label="Total Patient" value="78" />
+          <SummaryComp label="Total Patient" value={totalPatient} />
           
         </div>
 

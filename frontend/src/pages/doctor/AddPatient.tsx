@@ -231,7 +231,7 @@ December	       11
                                                   content:"hello",
                                                   date:pros
                                       });
-                                      navigate('/dr/consult',{state:{date:pros}});
+                                      navigate('/doctor/consult',{state:{date:pros}});
                                  }} 
                      
                      className={` rounded-xl h-30   text-center flex flex-col justify-center items-center

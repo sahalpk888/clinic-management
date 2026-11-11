@@ -35,6 +35,12 @@ import AdminPharm from "./pages/admin/AdminPharm"
 import AdminAdd from "./pages/admin/AdminAdd"
 import AdminStaff from "./pages/admin/AdminStaff"
 import MedicinePage from "./component/MedicinePage"
+import ClinicSignup from "./component/Test2"
+import ClinicSignuppage from "./component/ClinicSignuppage"
+import Login from "./component/loginPage"
+import Unauthorized from "./component/Unauthorized"
+import ProtectedRoute from "./component/ProtectedRoute"
+import PageNotFound from "./component/PageNotFound"
 
 
 
@@ -61,61 +67,65 @@ function App() {
               <Route path='/home' element={<Home/>}  />
               <Route path='/test' element={<Test/>}  />
               <Route path='/test2' element={<MedicineLabelApp/>}  />
-              <Route path='/doctor' element={<Doctor onNext={handleDoctorNext}  doctorName="Sahal" clinicName="MIMS"  />}  />    {/* onNext func gets the value from doctor page */}
               {/* <Route path='/dr' element={<Doctor onNext={(data)=>console.log(data)}  doctorName="Sahal" clinicName="MIMS"  />}  />  */} ///method-2
               <Route path='/medicine' element={<MedicinePage/>} />
+              <Route path='/signup' element={<ClinicSignuppage/>} />
+              <Route path='/login' element={<Login />} />
+              <Route path="unauthorised" element={<Unauthorized/>}  />
+
+              <Route path="*" element={<PageNotFound />} /> /// if we search any url which is not there it goes here.eg: /doctor/report..
          
 
 
 
-             {/* --------------------------------------------------------------------- */}
-
-                  <Route path='/dr' element={<Sidebar/>}>
-
-                      <Route index element={<Dashboard/>} />
-                      <Route path='add' element={<AddPatient/>} />
-                      <Route path='history' element={<DoctorHistory/>} />
-                      <Route path='appoint' element={<Appointment/>} />
-
-                      <Route path='consult' element={<Consult/>}  />
-
-                  </Route>
+             {/* --------------------------------------------------------------------- */}  
+                <Route element={<ProtectedRoute allowedroles={["doctor"]}/>} >
+                                <Route path='/doctor' element={<Sidebar/>}>
+                                    <Route index element={<Dashboard/>} />
+                                    <Route path='add' element={<AddPatient/>} />
+                                    <Route path='history' element={<DoctorHistory/>} />
+                                    <Route path='appoint' element={<Appointment/>} />
+                                     <Route path='consult' element={<Consult/>}  />
+                                </Route>
+                               
+                                <Route path='/doctorpage' element={<Doctor onNext={handleDoctorNext}  doctorName="Sahal" clinicName="MIMS"  />}  />    {/* onNext func gets the value from doctor page */}
+                </Route>
       
              {/* --------------------------------------------------------------------- */}
-
-                  <Route path="/pharm" element={<PharmSidebar/>}>
-                      <Route index element={<PharmDash/>} />
-                      <Route path='cart' element={<PharmInventory/>} />
-                      <Route path='add' element={<Add/>} />
-                      <Route path='history' element={<PharmHistory/>} />
-                  </Route>
-
-                  <Route path='/pharm/view' element={<Bill/>} />
-
+                <Route element={<ProtectedRoute allowedroles={["pharmacist"]}/>} >
+                                <Route path="/pharmacist" element={<PharmSidebar/>}>
+                                    <Route index element={<PharmDash/>} />
+                                    <Route path='cart' element={<PharmInventory/>} />
+                                    <Route path='add' element={<Add/>} />
+                                    <Route path='history' element={<PharmHistory/>} />
+                                </Route>
+                                <Route path='/pharmacist/view' element={<Bill/>} />
+                </Route>
              {/* --------------------------------------------------------------------- */}
 
 
-
-                  <Route path="/recep" element={<RecepSidebar/>} >
-                      <Route index element={<RecepDash/>} />
-                      <Route path='view' element={<RecepView/>} />
-                      <Route path='book' element={<RecepBooking />} />
-                      <Route path='token' element={<RecepToken/>} />
-                      <Route path='history' element={<RecepHistory/>} />
-                      <Route path='appoint' element={<RecepAppoint/>} />
-                  </Route>
-
-
+                <Route element={<ProtectedRoute allowedroles={["receptionist"]}/>} >
+                              <Route path="/receptionist" element={<RecepSidebar/>} >
+                                  <Route index element={<RecepDash/>} />
+                                  <Route path='view' element={<RecepView/>} />
+                                  <Route path='book' element={<RecepBooking />} />
+                                  <Route path='token' element={<RecepToken/>} />
+                                  <Route path='history' element={<RecepHistory/>} />
+                                  <Route path='appoint' element={<RecepAppoint/>} />
+                              </Route>
+                </Route>
 
             {/* --------------------------------------------------------------------- */}
 
-              <Route path="/admin" element={<AdminSidebar/>}>
-                   <Route index element={<AdminDash/>} />
-                   <Route path='dr' element={<AdminDoctor/>} />
-                   <Route path='pharm' element={<AdminPharm/>} />
-                   <Route path='add' element={<AdminAdd/>} />
-                   <Route path='info' element={<AdminStaff/>} />
-              </Route>
+                <Route element={<ProtectedRoute allowedroles={["admin"]}/>} >
+                            <Route path="/admin" element={<AdminSidebar/>}>
+                                <Route index element={<AdminDash/>} />
+                                <Route path='dr' element={<AdminDoctor/>} />
+                                <Route path='pharm' element={<AdminPharm/>} />
+                                <Route path='add' element={<AdminAdd/>} />
+                                <Route path='info' element={<AdminStaff/>} />
+                            </Route>
+                </Route>
 
 
                

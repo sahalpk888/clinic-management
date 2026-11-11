@@ -6,12 +6,12 @@ const RecepSidebar = () => {
 
 
     const items=[
-        {name:"Token",path:"/recep/token"},
-        {name:"View",path:"/recep/view"},
-        {name:"Booking",path:"/recep/book"},
-        {name:"Dashboard",path:"/recep"},
-        {name:"Patient History",path:"/recep/history"},
-        {name:"Appointment",path:"/recep/appoint"},
+        {name:"Token",path:"/receptionist/token"},
+        {name:"View",path:"/receptionist/view"},
+        {name:"Booking",path:"/receptionist/book"},
+        {name:"Dashboard",path:"/receptionist"},
+        {name:"Patient History",path:"/receptionist/history"},
+        {name:"Appointment",path:"/receptionist/appoint"},
     ]
 
 
@@ -30,7 +30,7 @@ const RecepSidebar = () => {
                 <div className='mt-10'>
                     {
                             items.map((pro)=>(
-                                <NavLink to={pro.path} end={pro.path==='/recep'} className={({isActive})=>`flex text-white items-center py-3 px-4 gap-3 ${isActive?"border-r-4 bg-teal border-primary":"hover:bg-monitor border-white"}`}>
+                                <NavLink to={pro.path} end={pro.path==='/receptionist'} className={({isActive})=>`flex text-white items-center py-3 px-4 gap-3 ${isActive?"border-r-4 bg-teal border-primary":"hover:bg-monitor border-white"}`}>
                                                     <p>{pro.name}</p>
                                 </NavLink>
 

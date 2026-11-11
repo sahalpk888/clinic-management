@@ -27,6 +27,11 @@ const Appointment = () => {
 
       const[details,setDetails]=useState<appointDetails[]>([]);
 
+      const[result,setResult]=useState({
+            totalcount:0,
+            completecount:0
+      })
+
         
 
 
@@ -86,9 +91,9 @@ const Appointment = () => {
                                     date:fullDate
                               }
                         })
-
-                        //console.log(resp)
+                        
                         setDetails(resp.data.result)
+                        
 
                   }catch(err){
                         console.log(err)
@@ -98,6 +103,32 @@ const Appointment = () => {
             hello()
 
       },[currentMonth,currentYear,todayDate])
+
+      useEffect(()=>{
+           const sahal=async()=>{
+             try{
+                   const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(todayDate).padStart(2, "0")}`;
+
+                  const res=await api.get('/api/dr/getdetails',{
+                        params:{
+                              date:fullDate
+                        }
+                  });
+
+                  //console.log(res)
+                  setResult({ 
+                              totalcount: res.data.result.totalcount.total,
+                              completecount: res.data.result.completecount.complete
+                  })
+
+
+            }catch(err){
+                  console.log(err)
+            }
+           }
+
+           sahal()
+      },[currentMonth,todayDate])
 
       
       
@@ -118,13 +149,13 @@ const Appointment = () => {
 
                     <div className=' flex flex-col text-center p-5 border border-slate-300 rounded-xl '>
                         <p className='text-2xl text-slate-500 '>Todays Appointment</p>
-                        <p className='text-3xl font-bold'>12</p>
+                        <p className='text-3xl font-bold'>{result.totalcount}</p>
                     </div>
 
 
                     <div className='border border-slate-300 rounded-xl flex flex-col text-center p-5 '>
                         <p className='text-2xl text-slate-500 '>Completed</p>
-                        <p className='text-3xl font-bold'>7</p>
+                        <p className='text-3xl font-bold'>{result.completecount}</p>
                     </div>
 
           </div>

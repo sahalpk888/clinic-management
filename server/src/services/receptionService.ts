@@ -1,9 +1,10 @@
-import { asc, count, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, count, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "../db/db.js";
 import { patient } from "../db/schema/patient.js";
 import { queue } from "../db/schema/queue.js";
 import { registerValidInput } from "../validator/receptionValidator.js";
 import { visit } from "../db/schema/visit.js";
+import { clinic } from "../db/schema/clinic.js";
 
 
 
@@ -11,7 +12,7 @@ import { visit } from "../db/schema/visit.js";
 
 /// registerValidInput is a interface created in validator
 
-export const registerPatientService=async(data:registerValidInput)=>{
+export const registerPatientService=async(data:registerValidInput,clinicIddata:string)=>{
 
    //// 2026-10-08T06:56:12.128Z  ------->  2026-10-08
     const today=new Date().toISOString().split("T")[0];
@@ -30,6 +31,7 @@ export const registerPatientService=async(data:registerValidInput)=>{
                                                 name:data.name,  /* here the frontend sends like {name:"rahul"} so just data.name */
                                                 gender:data.gender,
                                                 age:String(data.age),
+                                                clinicId:clinicIddata,
                                                 phone:String(data.phone),
                                                 weight:data.weight?.toString() ?? null,
                                                 height:data.height?.toString() ?? null,
@@ -43,7 +45,7 @@ export const registerPatientService=async(data:registerValidInput)=>{
 
                 const [counterData]=await tx 
                                     .insert(queue)             /* It means: if a row for this date already exists, update it instead of inserting a duplicate. */
-                                    .values({date:today,lastToken:1}).onConflictDoUpdate({target:queue.date,
+                                    .values({date:today,lastToken:1,clinicId:clinicIddata}).onConflictDoUpdate({target:[queue.clinicId, queue.date],
                                                                                               set:{
                                                                                                 lastToken:sql`${queue.lastToken}+1`
                                                                                               }                                         
@@ -58,6 +60,7 @@ export const registerPatientService=async(data:registerValidInput)=>{
                                     .values({
                                            patientId:patientData.id,
                                            date:today,
+                                           clinicId:patientData.clinicId,
                                            token:counterData.lastToken
                                            //status:"waiting"
 
@@ -76,18 +79,23 @@ export const registerPatientService=async(data:registerValidInput)=>{
 
 
 
-export const exisitingPatientService=async(query:string)=>{
+export const exisitingPatientService=async(query:string,clinicIdData:string)=>{
 
   const searchitem= query.trim()
 
   const ok=await db
                  .select()
                  .from(patient)
-                 .where(
-                   or(
+                 .where(  
+                   and(
+                    eq(patient.clinicId,clinicIdData),
+                    or(
                     ilike(patient.name,`${searchitem}%`),
                     ilike(patient.phone,`${searchitem}%`)
                    )
+
+                   )
+                   
                  )
                  .orderBy(asc(patient.name))
                  .limit(10)
@@ -113,7 +121,7 @@ interface NewPatientInput {
 
 
 
-export const bookingPatient=async(newpatient:registerValidInput,bookingDate:string)=>{
+export const bookingPatient=async(newpatient:registerValidInput,bookingDate:string,clinicIdData:string)=>{
 
   return await db.transaction(async(mx)=>{
 
@@ -123,6 +131,7 @@ export const bookingPatient=async(newpatient:registerValidInput,bookingDate:stri
                                .values({
                                  name: newpatient.name,
                                   age: String(newpatient.age),
+                                  clinicId:clinicIdData,
                                   gender: newpatient.gender,
                                   phone: newpatient.phone,
                                   weight: newpatient.weight?.toString() ?? null,
@@ -136,10 +145,9 @@ export const bookingPatient=async(newpatient:registerValidInput,bookingDate:stri
 
          const [newcounter]=await mx 
                             .insert(queue)
-                            .values({date:bookingDate,lastToken:1}).onConflictDoUpdate({target:queue.date,   /*  Suppose today's date doesn't exist in the queue table.  then add token=1 else increment */
-                                                                                              set:{
-                                                                                                lastToken:sql`${queue.lastToken}+1`
-                                                                                              }                                         
+                            .values({date:bookingDate,lastToken:1,clinicId:clinicIdData,}).onConflictDoUpdate({
+                                                                                              target:[queue.clinicId,queue.date],   /* 1.here we given clinicid.so in queue table that clinicid token is exist and  incremeneted it that specific lasttoken clinic.. 2. Suppose today's date doesn't exist in the queue table.  then add token=1 else increment */
+                                                                                              set:{lastToken:sql`${queue.lastToken}+1`}                        
                                                                                           }).returning()
 
 
@@ -150,7 +158,8 @@ export const bookingPatient=async(newpatient:registerValidInput,bookingDate:stri
                               .values({
                                 patientId:newPatient.id,
                                 token:newcounter.lastToken,
-                                date:bookingDate
+                                date:bookingDate,
+                                clinicId:clinicIdData,
                                 //status:"waiting"
                               }).returning()
 
@@ -165,7 +174,7 @@ export const bookingPatient=async(newpatient:registerValidInput,bookingDate:stri
 
 }
 
-export const existingBooking=async(patientId:string,bookingDate:string)=>{
+export const existingBooking=async(patientId:string,bookingDate:string,clinicIdData:string)=>{
 
  return await db.transaction(async (ex)=>{
 
@@ -182,10 +191,9 @@ export const existingBooking=async(patientId:string,bookingDate:string)=>{
 
       const [oldCounter]=await ex 
                                .insert(queue)
-                               .values({date:bookingDate,lastToken:1}).onConflictDoUpdate({target:queue.date,   /*  Suppose today's date doesn't exist in the queue table.  then add token=1 else increment */
-                                                                                              set:{
-                                                                                                lastToken:sql`${queue.lastToken}+1`
-                                                                                              }                                         
+                               .values({date:bookingDate,lastToken:1,clinicId:clinicIdData}).onConflictDoUpdate({
+                                                                                               target:[queue.clinicId,queue.date],   /*  Suppose today's date doesn't exist in the queue table.  then add token=1 else increment */
+                                                                                               set:{lastToken:sql`${queue.lastToken}+1`}                                                                                                                                     
                                                                                           }).returning()
       //2
 
@@ -195,7 +203,7 @@ export const existingBooking=async(patientId:string,bookingDate:string)=>{
                                 patientId,
                                 token:oldCounter.lastToken,
                                 date:bookingDate,
-                                status:"waiting"
+                                clinicId:clinicIdData
                                }).returning()
 
         
@@ -210,7 +218,7 @@ export const existingBooking=async(patientId:string,bookingDate:string)=>{
 }
 
 
-export const receptionView=async()=>{
+export const receptionView=async(clinicIdData:string)=>{
 
   const isToday=new Date().toISOString().split("T")[0];
 
@@ -224,8 +232,18 @@ export const receptionView=async()=>{
                           token:visit.token
                         })
                         .from(visit)
-                        .innerJoin(patient,eq(visit.patientId,patient.id))
-                        .where(eq(visit.date,isToday))
+                        .innerJoin(patient,
+                                          and(
+                                             eq(visit.patientId,patient.id),
+                                             eq(visit.clinicId,patient.clinicId)
+                                          )
+                          )
+                        .where(
+                             and(
+                              eq(visit.date,isToday),
+                              eq(visit.clinicId, clinicIdData)
+                            )
+                          )
                         .orderBy(asc(visit.token))
 
 
@@ -241,7 +259,7 @@ interface getPatient{
   search:string
 }
 
-export const reception_HistoryofPatient=async({page,search}:getPatient)=>{
+export const reception_HistoryofPatient=async({page,search}:getPatient,clinicIdData:string)=>{
 
  
 
@@ -258,7 +276,12 @@ export const reception_HistoryofPatient=async({page,search}:getPatient)=>{
   const data=await db
                    .select()
                    .from(patient)
-                   .where(searchCondition)    ///here if we search according to that name it gives else search empty means where will undefine and all patient details comes
+                   .where(
+                    and(
+                      searchCondition,
+                      eq(patient.clinicId,clinicIdData)
+                    )
+                   )  ///here if we search according to that name it gives else search empty means where will undefine and all patient details comes
                    .limit(limit)
                    .offset(offset);
 
@@ -267,7 +290,11 @@ export const reception_HistoryofPatient=async({page,search}:getPatient)=>{
   const [countResult] = await db
                               .select({ total: count() })
                               .from(patient)
-                              .where(searchCondition);
+                              .where(and(
+                                    searchCondition,
+                                    eq(patient.clinicId,clinicIdData)
+                                  )
+                                );
 
   
 
@@ -292,12 +319,15 @@ export const reception_HistoryofPatient=async({page,search}:getPatient)=>{
 }
 
 
-export const already_bookedTimes=async(appoint_date:any)=>{
+export const already_bookedTimes=async(appoint_date:any,clinicIdData:string)=>{
   
   const result=await db
                      .select({a_time:visit.appoitTime})
                      .from(visit)
-                     .where(eq(visit.date,appoint_date))
+                     .where(and(
+                      eq(visit.date,appoint_date),
+                      eq(visit.clinicId,clinicIdData)
+                     ))
             
 
   return result.map((v)=>v.a_time)
@@ -309,32 +339,33 @@ export const already_bookedTimes=async(appoint_date:any)=>{
 
 
 /// appointent of already exisitng patient
-export const old_booking=async(patientId:string,timeAppoint:string,selectedDay:string)=>{
+export const old_booking=async(patientId:string,timeAppoint:string,selectedDay:string,clinicIdData:string)=>{
 
+  return await db.transaction(async (tx) => {
+              const [newcounter]=await tx 
+                                          .insert(queue)
+                                          .values({date:selectedDay,lastToken:1,clinicId:clinicIdData})
+                                                                                                      .onConflictDoUpdate({
+                                                                                                        target:[queue.clinicId,queue.date],   /*it means this particular clinic id that particulat date make lasttoken increment 1....  Suppose today's date doesn't exist in the queue table.  then add token=1 else increment */
+                                                                                                        set:{lastToken:sql`${queue.lastToken}+1`}                                     
+                                                                                                        }).returning()
+                const [booking]=await tx
+                                .insert(visit)
+                                .values({
+                                  patientId,
+                                  date:selectedDay,
+                                  appoitTime:timeAppoint,
+                                  clinicId:clinicIdData,
+                                  token:newcounter.lastToken
 
- const [newcounter]=await db 
-                            .insert(queue)
-                            .values({date:selectedDay,lastToken:1}).onConflictDoUpdate({target:queue.date,   /*  Suppose today's date doesn't exist in the queue table.  then add token=1 else increment */
-                                                                                              set:{
-                                                                                                lastToken:sql`${queue.lastToken}+1`
-                                                                                              }                                         
-                                                                                          }).returning()
-  const [booking]=await db
-                      .insert(visit)
-                      .values({
-                        patientId,
-                        date:selectedDay,
-                        appoitTime:timeAppoint,
-                        token:newcounter.lastToken
-
-                      }).returning()
+                                }).returning()
   
-
+                    
     return {
       booking
-
-
     }
+
+  })
 
 
 }
@@ -349,7 +380,7 @@ interface newBooking{
 }
 
 
-export const new_booking=async(singlePerson:newBooking,timeAppoint:string,selectedDay:string)=>{
+export const new_booking=async(singlePerson:newBooking,timeAppoint:string,selectedDay:string,clinicIdData:string)=>{
 
   return await db.transaction(async (pop)=>{
 
@@ -359,6 +390,7 @@ export const new_booking=async(singlePerson:newBooking,timeAppoint:string,select
                              .values({
                               name:singlePerson.name,
                               age:singlePerson.age,
+                              clinicId:clinicIdData,
                               gender:singlePerson.gender,
                               phone:singlePerson.phone,
                             
@@ -368,7 +400,7 @@ export const new_booking=async(singlePerson:newBooking,timeAppoint:string,select
         //2
          const [counter_booking]=await pop 
                             .insert(queue)
-                            .values({date:selectedDay,lastToken:1}).onConflictDoUpdate({target:queue.date,   /*  Suppose today's date doesn't exist in the queue table.  then add token=1 else increment */
+                            .values({date:selectedDay,lastToken:1,clinicId:clinicIdData}).onConflictDoUpdate({target:[queue.clinicId,queue.date],   /*  Suppose today's date doesn't exist in the queue table.  then add token=1 else increment */
                                                                                               set:{
                                                                                                 lastToken:sql`${queue.lastToken}+1`
                                                                                               }                                         
@@ -380,6 +412,7 @@ export const new_booking=async(singlePerson:newBooking,timeAppoint:string,select
                       .values({
                         patientId:patientadd.id,
                         date:selectedDay,
+                        clinicId:clinicIdData,
                         appoitTime:timeAppoint,
                         token:counter_booking.lastToken
 

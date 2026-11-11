@@ -28,7 +28,4 @@ export const medicineValidator=z.object({   /* 🚨🚨🚨🚨 this should be s
 
 })
 
-
-
-
 export type medicineValidatorInput=z.infer<typeof medicineValidator >;

@@ -1,22 +1,23 @@
 import { IndianRupee } from 'lucide-react'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import api from '../../api/api'
 
 
 interface SummaryIN{
   label:string,
-  value:string
+  value:number
 }
 
 interface MedcineTOP{
-  name:string,
+  medicinename:string,
   sold:number
 }
 
 interface MonthlyReportRow {
-  month: string
   bills: number
-  medicinesSold: number
+  date: string
+  day: string
   revenue: number
 
 }
@@ -24,28 +25,15 @@ interface MonthlyReportRow {
 const PharmDash = () => {
 
 
-  const [metric, setMetric] = useState<'bills' | 'medicinesSold' | 'revenue'>('medicinesSold')
+  const [metric, setMetric] = useState<'bills'  | 'revenue'>('bills')
+  const [dashdetails,setDashDetails]=useState({
+    bill:0,
+    medicine:0,
+  })
+  const [topmedicine,setTopMedicine]=useState<MedcineTOP[]>([])    ///for chart-1  
+  const[report,setReport]=useState<MonthlyReportRow[]>([])   /// for chart-2
+
   
-
-
-  const topmedicine:MedcineTOP[]=[    ///for chart-1
-    { name: 'Paracetamol', sold: 86 },
-    { name: 'Amoxicillin', sold: 64 },
-    { name: 'Cetirizine', sold: 51 },
-    { name: 'Ibuprofen', sold: 47 },
-    { name: 'Omeprazole', sold: 38 },
-    { name: 'Metformin', sold: 29 },
-   
-  ]
-
-   const MONTHLY_REPORT: MonthlyReportRow[] = [    ///for chart-2
-      { month: 'Jan', bills: 980, medicinesSold: 2100, revenue: 145000 },
-      { month: 'Feb', bills: 1020, medicinesSold: 2265, revenue: 158200 },
-      { month: 'Mar', bills: 1105, medicinesSold: 2480, revenue: 171500 },
-      { month: 'Apr', bills: 940, medicinesSold: 2010, revenue: 139900 },
-      { month: 'May', bills: 1180, medicinesSold: 2650, revenue: 184300 },
-      { month: 'Jun', bills: 1240, medicinesSold: 2790, revenue: 196700 },
-    ]
 
   const SummaryComp=({label,value}:SummaryIN)=>{
     return(
@@ -79,19 +67,47 @@ const PharmDash = () => {
   }
 
 
+  useEffect(()=>{
+    const hello=async()=>{
+      try{
+      /* ----------------------------- API ---------------------------------------------------- */
+        const resp=await api.get('/api/pharm/dash');           //1st api
+        const response=await api.get('/api/pharm/dashweek' );   //2nd api)
+      /* --------------------------------------------------------------------------------- */
+        /* setDashDetails(prev=>({
+          ...prev,
+          bill:resp.data.result.bill.count
+        }))
+         */
+        setDashDetails({
+          bill:resp.data.result.bill.count,
+          medicine:resp.data.result.medicinecount.medicinecount
+        })
+        setReport(response.data.result.weekDateDetails)
+        setTopMedicine(resp.data.result.medicineChart)
+
+      }catch(err){
+        console.log(err)
+      }
+    }
+
+    hello()
+
+  },[])
+
+
   
 
-                   //USEMEMO used for remember the result of a calculation so React doesn't have to calculate it again on every render..helps if it is more values
-   const sortedMedicines = useMemo(
-      () => [...topmedicine].sort((a, b) => b.sold - a.sold),    ///used for soring big to small order
-      []
-    )
+
 
       const metricLabel: Record<typeof metric, string> = {      /*  metrics is usestate....const[metric,setMetrics]=usestate()...here typeof metric means key,,value=string..so key should be same as metric usestate and value may be string */
         bills: 'Total Bills',   ///bills is part of usetstate "metrics" so it becaome "type of metric" if we give anyother it shos error because it si not in usetstae,and value is string..so 
-        medicinesSold: 'Medicines Sold',
         revenue: 'Revenue (₹)',
       }
+
+      const filter=[...topmedicine].sort(
+        (a,b)=>b.sold-a.sold
+      )
 
    
 
@@ -104,8 +120,8 @@ const PharmDash = () => {
    <div className='mx-auto px-6 space-y-8'>
     <h2 className='mt-10 text-2xl font-semibold p-2'>Pharmacy Dashboard</h2>
         <div className='flex flex-wrap gap-4'>
-          <SummaryComp label='Total Bill' value='172'  />
-          <SummaryComp label='Total Medicine' value='346'  />
+          <SummaryComp label='Total Bill' value={dashdetails.bill}  />
+          <SummaryComp label='Total Medicine' value={dashdetails.medicine}  />
               
         </div>
 
@@ -118,9 +134,9 @@ const PharmDash = () => {
                       {/* chart-1 */}
 
           <ResponsiveContainer width="100%" height={320}>
-             <BarChart data={sortedMedicines} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} >
+             <BarChart data={filter} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} >
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />   ///  lines like this ----------------
-              <XAxis dataKey='name'  tick={{ fontSize: 12 }} interval={0} angle={-15} textAnchor="end" height={60} />
+              <XAxis dataKey='medicinename'  tick={{ fontSize: 12 }} interval={0} angle={-15} textAnchor="end" height={60} />
               <YAxis tick={{fontSize:12}} />
               <Tooltip content={<CustomTooltip/>} />  {/* when hover the value can been seen */}
               <Bar dataKey="sold" name="Units Sold" fill="#4f46e5" radius={[6, 6, 0, 0]} />
@@ -133,7 +149,7 @@ const PharmDash = () => {
         <div className='border bg-white shadow-sm border-slate-200 rounded mb-10'>
               <div className='flex gap-10 p-10'>
                     {
-                      (['medicinesSold','bills','revenue']as const).map((pro)=>(
+                      (['bills','revenue']as const).map((pro)=>(
                         <button onClick={()=>setMetric(pro)} className={`bg-primary rounded-full p-2 cursor-pointer
                                                                           ${metric === pro? 'bg-indigo-600 text-white border-indigo-600': 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`} 
                         >
@@ -146,9 +162,9 @@ const PharmDash = () => {
                                        {/*  ////  chart-2 */}
 
             <ResponsiveContainer  width="100%" height={320} >
-              <LineChart data={MONTHLY_REPORT} margin={{ top: 10, right: 20, left: 0, bottom: 0 }} >
+              <LineChart data={report} margin={{ top: 10, right: 20, left: 0, bottom: 0 }} >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <XAxis dataKey="day" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                  <Tooltip content={<CustomTooltip />} />
                   <Legend />     ////botoom message 
@@ -178,10 +194,10 @@ const PharmDash = () => {
                     </thead>
                     <tbody >
                       {
-                        MONTHLY_REPORT.map((pos)=>(
+                        report.map((pos)=>(
                           <tr className='border-b border-gray-300 last:border-0'>
-                            <td className="px-4 py-3 text-left ">{pos.month}</td>
-                            <td className="px-4 py-3 text-left ">{pos.medicinesSold.toLocaleString()}</td>
+                            <td className="px-4 py-3 text-left ">{pos.day}</td>
+                            <td className="px-4 py-3 text-left ">{pos.revenue.toLocaleString()}</td>
                             <td className="px-4 py-3 text-left ">{pos.bills.toLocaleString()}</td>
                           </tr>
                         ))

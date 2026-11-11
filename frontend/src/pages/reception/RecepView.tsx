@@ -59,7 +59,7 @@ const RecepView = () => {
       <table className='w-200 table-fixed'>
         <tbody>
           {
-            patient.reverse().map((pro,idx)=>(
+            patient?.reverse().map((pro,idx)=>(
               <tr className='text-center border'>
                 <td className='w-10 p-2 border'>{pro.token}</td>
                 <td className='w-10 p-2 border '>{pro.name}</td>
