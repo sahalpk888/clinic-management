@@ -33,6 +33,9 @@ const Sidebar = () => {
                     ))
                 }
             </div>
+                            <div className='mx-auto mt-50  '>
+                                <button onClick={ok} disabled={loading} className='bg-red-900 w-20 h-10 rounded text-sm text-white cursor-pointer hover:bg-red-200 '>{loading?"Logging out...":"Log out"}</button>
+                            </div>
 
         </div>
 

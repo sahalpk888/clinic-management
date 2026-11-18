@@ -1,20 +1,33 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff, LockKeyhole, Mail, Plus } from "lucide-react";
 import api from "../api/api";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/Appcontext";
+import type { Role } from "../types/roles";
+import type { Owner } from "../types/owner";
+
+
+
+
+
+interface meResponse{
+  user:Owner
+}
 
 
 const Login = () => {
 
    const location = useLocation();
 
-  const{setOwner,navigate}=useAppContext()
+
+
+  const{owner,setOwner,navigate}=useAppContext()
 
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const[slug,setSlug]=useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -28,24 +41,32 @@ const Login = () => {
       const response = await api.post("/api/clinic/login", {
         email,
         password,
+        slug
       });
 
-      console.log(response.data);
+      console.log(response)
       
-/*       // Fetch the logged-in user (cookie is now set)
-        const me = await api.get("/api/clinic/me");
-        const user = me.data.user;
-        setOwner(user); */
+
+          // 2. Fetch authenticated user details
+          const me = await api.get<meResponse>("/api/clinic/me");
+          const user=me.data.user
+
+          // 3. Update AppContext
+          setOwner(me.data.user);
+          
+          // 4 Default dashboard according to role
+          const defaultRoutes:Record<Role,string> = {
+            admin: "/admin",
+            doctor: "/doctor",
+            pharmacist: "/pharmacist",
+            receptionist: "/receptionist",
+          };
+
+          // 5  Redirect to previous page
+          const from = location.state?.from?.pathname ;                          ////this comes form Protectedroute.tsx...
+          navigate(from || defaultRoutes[user.role], { replace: true });         ///naviagte to corresponsing page eg:admin logi means admin page
 
 
-        // Redirect to previous page
-        const from = location.state?.from?.pathname || "/dashboard";   ////this comes form Protectedroute.tsx...
-
-       navigate(from, { replace: true });
-
-      // Handle successful login here.
-      // Store user details in your AppContext.
-      // Navigate according to the user's role.
 
     } catch (err: any) {
       setError(
@@ -55,6 +76,24 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+
+
+
+  useEffect(() => {   ///redirect directly to dashabord if already loggedin
+    if (owner) {
+      const dashboardRoutes: Record<Role, string> = {
+        admin: "/admin",
+        doctor: "/doctor",
+        pharmacist: "/pharmacist",
+        receptionist: "/receptionist",
+      };
+
+      navigate(dashboardRoutes[owner.role], { replace: true });
+    }
+  }, [owner, navigate]);
+
+
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
@@ -68,7 +107,7 @@ const Login = () => {
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-800">
-              CarePoint
+              ClinOS
             </h1>
             <p className="text-sm text-slate-500">
               Clinic Management System
@@ -88,8 +127,30 @@ const Login = () => {
 
         <form onSubmit={handleLogin} className="space-y-5">
 
+          {/* slug */}
+          <div>
+            
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Clinic Slug
+            </label>
+
+            <div className="flex items-center border rounded-lg px-3 focus-within:border-teal-600">
+              <Mail size={19} className="text-slate-400" />
+
+              <input
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                placeholder="clinic-slug"
+                className="w-full p-3 outline-none text-sm"
+                required
+              />
+            </div>
+          </div>
+
+
           {/* Email */}
           <div>
+            
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Email address
             </label>
@@ -153,7 +214,7 @@ const Login = () => {
         </form>
 
         <p className="text-center text-xs text-slate-400 mt-7">
-          Secure access for authorized clinic staff
+          Not Registered? <span className="hover:text-blue-400 cursor-pointer" onClick={()=>navigate('/signup')}>Signup now</span>
         </p>
 
       </div>

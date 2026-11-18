@@ -34,6 +34,8 @@ export default function App() {
   const [endDate, setEndDate] = useState("");
   const [leaveSubmitted, setLeaveSubmitted] = useState(false);
 
+  const[attendace,setAttendance]=useState<File | null>(null);
+
   const[staff,setStaff]=useState({
     address: "",
     age:null, 
@@ -48,7 +50,7 @@ export default function App() {
 
   })
 
-  const fileRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);  /// here the ref is assigned to the hidden input ,when the button onlcik the ref.current.click() what do is it click the input so it open and we store image .click clicks where we set <input ref={fileref} />
 
   const today = new Date(staff.createdAt).toLocaleDateString("en-IN", {
     weekday: "long",
@@ -58,8 +60,13 @@ export default function App() {
   });
 
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setPhoto(URL.createObjectURL(file));
+    const fileData = e.target.files?.[0];
+
+    if(!fileData) return;
+
+    setAttendance(fileData);
+    
+    if (fileData) setPhoto(URL.createObjectURL(fileData));
   };
 
   const navigation = [
@@ -113,6 +120,11 @@ export default function App() {
     hello()
 
   },[])
+
+
+  const handleAttendance=async()=>{
+
+  }
 
 
 

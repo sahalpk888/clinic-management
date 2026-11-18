@@ -30,14 +30,14 @@ const Nav = () => {
              </NavLink>
             
             <div className="">
-                <a href='#' className={'text-primary  px-5'}>About us</a>   {/* brings to top page */}
-                <a href='/'  className={'text-primary px-5'}>Book appoitment</a>  {/* brings to home page */}
-                <a href='#review'  className={'text-primary px-5'}>Call us</a>
-                <a href='#review'  className={'text-primary px-5'}>Admisiion</a>   {/* bring to id='review' */}
+                <a href="#platform" className={'text-primary  px-5'}>Platform</a>   {/* brings to top page */}
+                <a href='#aboutus'  className={'text-primary px-5'}>About us</a>
+                <a href='#foryourteam'  className={'text-primary px-5'}>For your team</a>  {/* brings to home page */}
+
             </div>
 
             <div>
-                <NavLink to='/' className="text-accent font-semibold px-5 py-3 rounded-md" style={{ background: C.teal, color: C.paper }}>Login</NavLink>
+                <NavLink to='/login' className="text-accent font-semibold px-5 py-3 rounded-md" style={{ background: C.teal, color: C.paper }}>Login</NavLink>
             </div>
 
 

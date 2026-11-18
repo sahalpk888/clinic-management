@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { assets } from '../../assets/assets'
 import { NavLink, Outlet } from 'react-router-dom'
+import { useAppContext } from '../../context/Appcontext'
+import api from '../../api/api'
 
 
 
@@ -38,6 +40,31 @@ updatedAt
 
     ]
 
+    const{setOwner,navigate}=useAppContext()
+    const [loading, setLoading] = useState(false);
+
+    const ok=async()=>{
+        try{
+            const resp=await api.post('/api/clinic/logout')
+
+                if(resp.data.success){
+                    setOwner(null)
+                   navigate('/login')
+
+                }
+        }
+        catch(err){
+            console.log(err)
+        }
+        finally{
+            setLoading(false)
+        }
+
+
+    }
+
+
+
   return (
     <div className="flex  min-h-screen ">
         
@@ -56,6 +83,9 @@ updatedAt
                                 ))
                             }
                         </div>
+                            <div className='mx-auto mt-50  '>
+                                <button onClick={ok} disabled={loading} className='bg-red-900 w-20 h-10 rounded text-sm text-white cursor-pointer hover:bg-red-200 '>{loading?"Logging out...":"Log out"}</button>
+                            </div>
 
         </div>
 

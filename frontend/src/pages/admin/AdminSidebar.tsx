@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { assets } from '../../assets/assets'
+import { useAppContext } from '../../context/Appcontext'
+import api from '../../api/api'
 
 const AdminSidebar = () => {
 
@@ -11,6 +13,31 @@ const AdminSidebar = () => {
         {name:"Add Staff",path:'/admin/add'},
         {name:"Staff info",path:'/admin/info'},
     ]
+
+        const{setOwner,navigate}=useAppContext()
+        const [loading, setLoading] = useState(false);
+
+    const ok=async()=>{
+        try{
+            const resp=await api.post('/api/clinic/logout')
+
+                if(resp.data.success){
+                    setOwner(null)
+                   navigate('/login')
+
+                }
+        }
+        catch(err){
+            console.log(err)
+        }
+        finally{
+            setLoading(false)
+        }
+
+
+    }
+
+
   return (
     <div className=' flex min-h-screen'>
         <div className='w-64 bg-slate-900 flex flex-col'>
@@ -26,6 +53,10 @@ const AdminSidebar = () => {
 
                     ))}
                 </div>
+
+                            <div className='mx-auto mt-50  '>
+                                <button onClick={ok} disabled={loading} className='bg-red-900 w-20 h-10 rounded text-sm text-white cursor-pointer hover:bg-red-200 '>{loading?"Logging out...":"Log out"}</button>
+                            </div>
 
         </div>
 

@@ -41,6 +41,9 @@ import Login from "./component/loginPage"
 import Unauthorized from "./component/Unauthorized"
 import ProtectedRoute from "./component/ProtectedRoute"
 import PageNotFound from "./component/PageNotFound"
+import AdminStaffDetails from "./component/AdminStaffDetails"
+import Test2 from "./component/Test2"
+import PatientDetail from "./component/PatientDetail"
 
 
 
@@ -66,7 +69,8 @@ function App() {
               <Route path='/' element={<LandingPage/>}  />
               <Route path='/home' element={<Home/>}  />
               <Route path='/test' element={<Test/>}  />
-              <Route path='/test2' element={<MedicineLabelApp/>}  />
+              <Route path='/test2' element={<Test2/>}  />
+         
               {/* <Route path='/dr' element={<Doctor onNext={(data)=>console.log(data)}  doctorName="Sahal" clinicName="MIMS"  />}  />  */} ///method-2
               <Route path='/medicine' element={<MedicinePage/>} />
               <Route path='/signup' element={<ClinicSignuppage/>} />
@@ -125,12 +129,22 @@ function App() {
                                 <Route path='add' element={<AdminAdd/>} />
                                 <Route path='info' element={<AdminStaff/>} />
                             </Route>
+                            <Route path='/admin/staff/:emp' element={<AdminStaffDetails/>} />
                 </Route>
 
 
                
 
-            {/* --------------------------------------------------------------------- */}
+            {/* --------------------------  Commonly used  ------------------------------------------- */}
+
+                    <Route element={<ProtectedRoute allowedroles={["doctor","receptionist"]}/>} >
+                       
+                         <Route path='/clinic/patient/:patientId' element={<PatientDetail/>} />
+                    
+                    </Route>
+
+
+             {/* --------------------------------------------------------------------- */}
 
          
      </Routes>

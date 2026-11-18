@@ -53,7 +53,7 @@ const Banner = () => {
 
   return (
     
-    <section  className="border-b   "
+    <section id='platform'  className="border-b   "
         style={{
           borderColor: C.rule,
           backgroundImage: `linear-gradient(${C.rule} 1px, transparent 1px), linear-gradient(90deg, ${C.rule} 1px, transparent 1px)`,
@@ -68,23 +68,19 @@ const Banner = () => {
 
 
             
-        <div className="max-w-6xl mx-auto px-6 py-37 grid lg:grid-cols-2   gap-14 items-center">
+        <div className="max-w-6xl mx-auto  px-6 py-37 grid lg:grid-cols-2   gap-18 items-center">
             <div>
                 <div>
-                    <div className='bg-secondary inline-flex items-center gap-2  text-[11px] uppercase tracking-widest px-3 py-1 rounded-full mb-6'>
+                    <div className='bg-secondary inline-flex items-center gap-5  text-[11px] uppercase tracking-widest px-3 py-1 rounded-full mb-6'>
                         <h1 className='text-paper'>Clinic Management System</h1>
                     
                     </div>
 
-                    <h1 className="clinos-display font-semibold text-[2.75rem] leading-[1.05] tracking-tight mb-6">
-                        One system.
-                        <br />
-                        Every seat
-                        <br />
-                        in the clinic.
+                    <h1 className="max-w-2xl text-5xl font-bold leading-[1.08] tracking-[-0.045em] text-slate-950 sm:text-6xl xl:text-[4.35rem]">
+                        Better organised clinics. <span className="text-teal-700">More time for care.</span>
                     </h1>
 
-                    <p className='max-w-100 leading-relaxed' style={{color:`${C.ink}B3`}}>
+                    <p className='max-w-100 leading-relaxed mt-4' style={{color:`${C.ink}B3`}}>
                         ClinOS replaces the paper register, the loose prescription pad and the shelf
                         notebook with a single role-aware platform — from the front desk to the
                         pharmacy rack.
