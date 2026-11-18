@@ -14,6 +14,7 @@ import { clinicPolicy } from "./clinicPolicy.js";
 import { roleEnum } from "./employee.js";
 import { employee } from "./employee.js";
 import { employeeDetails } from "./employeeDetails.js";
+import { patientRelation,visitRelation,consultRelation,prescriptionRelation,medicineRelation } from "./relations.js";
 
 
 export {                  /* becasue in drizzle.config.ts we calling only index_schema.ts so other all schema need to be export  */
@@ -32,7 +33,12 @@ export {                  /* becasue in drizzle.config.ts we calling only index_
     clinicPolicy,
     roleEnum,
     employee,
-    employeeDetails
+    employeeDetails,
+    patientRelation,
+    visitRelation,
+    consultRelation,
+    prescriptionRelation,
+    medicineRelation
     
     
     

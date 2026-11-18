@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { db } from "../db/db.js";
 import { patient } from "../db/schema/patient.js";
 import { exisitingPatient, registerValidatePatient } from "../validator/receptionValidator.js";
-import { already_bookedTimes, bookingPatient, exisitingPatientService, existingBooking, new_booking, old_booking, reception_HistoryofPatient, receptionView, registerPatientService } from "../services/receptionService.js";
+import { already_bookedTimes, bookingPatient, exisitingPatientService, existingBooking, new_booking, old_booking, reception_HistoryofPatient, receptionist_dashService, receptionView, registerPatientService } from "../services/receptionService.js";
 import { string } from "zod";
 
 
@@ -281,4 +281,26 @@ export const reception_bookappoint=async(req:Request,res:Response)=>{
   }catch(err){
     console.log(err)
   }
+}
+
+export const reception_dash=async(req:Request,res:Response)=>{
+    try{
+
+        const clinic=req.user!.clinicId
+    
+
+        const result =await receptionist_dashService(clinic)
+
+        return res.json({
+            success:true,
+            result
+        })
+
+    }catch(err){
+        console.log(err);
+        return res.json({
+            success:false,
+            message:"admin_dash Failed"
+        })
+    }
 }

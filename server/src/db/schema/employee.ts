@@ -22,10 +22,12 @@ export const employee=pgTable("employee",{
     email:varchar("email").notNull(),
     passwordHash:varchar("password_hash",{length:255}).notNull(),
     role:roleEnum("role").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull()   
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    status:varchar("status").default("active")   
 
 },
 (table)=>[
     unique("employee_clinic_email_unique").on(table.clinicId,table.email)
 ]
 )
+

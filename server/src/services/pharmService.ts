@@ -37,7 +37,7 @@ export const medicineService=async(data:medicineValidatorInput,clinicIdData:stri
                             dosageform:data.dosageform, 
                             purchaseprice:data.purchaseprice,
                             sellingprice:data.sellingprice,
-                            stock:data.stock,
+                            stock:String(data.stock),
                             batchnumber:data.batchnumber,
                             barcodeid:data.barcodeid,
                             expiry:data.expiry,
@@ -240,8 +240,8 @@ export const pharm_approveService=async(bill_id:string,paymentmethod:PaymentType
                   .set({status:"completed"})
                   .where(and(
                         eq(pharmacyBill.id,bill_id),
-                        eq(pharmacyBill.clinicId,clinicIdData)
-
+                        eq(pharmacyBill.clinicId,clinicIdData),
+                        eq(pharmacyBill.status, "pending")
                      )
                   ).returning()
 
@@ -255,7 +255,39 @@ export const pharm_approveService=async(bill_id:string,paymentmethod:PaymentType
 
                     })
                     .returning()
-  
+
+        const stock=await tx             //////// used to reduce the qty from inventory after selling
+                          .select({
+                            stock:pharmMedicine.stock,
+                            totalunit:pharmMedicine.totalunit,   //// it means eg:10 (10 tablet ina slip,,, 1 stock=10tablet )
+                            qty:prescriptionSchema.qty,   ///qty prescribed ,which emasn total selling qty
+                            medicineId:pharmMedicine.id
+                          })
+                          .from(pharmacyBill)
+                          .innerJoin(consultationSchema,eq(consultationSchema.id,pharmacyBill.consultId))
+                          .innerJoin(prescriptionSchema,eq(prescriptionSchema.consultId,consultationSchema.id))
+                          .innerJoin(pharmMedicine,eq(pharmMedicine.id,prescriptionSchema.medicine))
+                          .where(and(
+                            eq(pharmacyBill.id,bill_id),
+                            eq(pharmacyBill.clinicId,clinicIdData)
+                          ))
+                console.log("STOCKKKKKK : ",stock)
+
+            const stock_update=await Promise.all(
+                stock.map(async(pos)=>{
+                     
+                  const stocker=Number((pos.stock)) * Number(pos.totalunit)   ///eg:stok=222 means 222*10=2220 units
+                  const reduceqty=pos.qty  ///we need to reduce qty to uodate the real stcok eg: 6(qty)
+                  const doms=stocker - reduceqty ///eg: 2220-6
+                  const final=doms/Number(pos.totalunit)   ///221.4/10 ===? 221.4 (convert back to stock)
+
+                  return await tx 
+                                .update(pharmMedicine)
+                                .set({stock:final.toFixed(2)})
+                                .where(eq(pharmMedicine.id,pos.medicineId))
+                      
+                })
+            )
   
 
       return {
@@ -395,7 +427,7 @@ export const pharm_DashWeeklyService=async(clinicIdData:string)=>{
 
      // 2. Get Monday of the current week...if today is wed nov-4 then it gives automatically using (startofWeek --data-fns )monday as nov-2
     const monday=startOfWeek(today,{
-      weekStartsOn:1
+      weekStartsOn:1  //1 means monday ,0 measn sunday
     })
     
       
@@ -423,19 +455,20 @@ export const pharm_DashWeeklyService=async(clinicIdData:string)=>{
                               'YYYY-MM-DD'
                             )`
                           );
+
+
+                          
       const weekDateDetails=Array.from({length:6},(_,i)=>{
+                  const date=addDays(monday,i); ///here first is (monday,0) menas monday itself ..next (monday,1) menas tuesday likewise upto sunday
+                  const formatteddate=format(date,"yyyy-MM-dd"); ///it converts to 2026-10-02
+                  const stats=result.find((itm)=>itm.date === formatteddate)
 
-        const date=addDays(monday,i); ///here first is (monday,0) menas monday itself and gives 2026-10-02..next (monday,1) menas tuesday likewise upto sunday
-        const formatteddate=format(date,"yyyy-MM-dd"); ///it converts to 2026-10-02
-        const stats=result.find((itm)=>itm.date === formatteddate)
-
-        return {
-          date:formatteddate,
-          day:format(date,"EEE"),
-          bills: Number(stats?.bills ?? 0),
-          revenue: Number(stats?.revenue ?? 0),
-        }
-
+                  return {
+                    date:formatteddate,
+                    day:format(date,"EEE"),
+                    bills: Number(stats?.bills ?? 0),
+                    revenue: Number(stats?.revenue ?? 0),
+                  }
       })
 
       return{
@@ -446,5 +479,7 @@ export const pharm_DashWeeklyService=async(clinicIdData:string)=>{
     
     
 }
+
+
 
 

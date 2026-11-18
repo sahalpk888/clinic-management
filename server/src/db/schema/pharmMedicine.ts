@@ -1,5 +1,5 @@
 
-import { date, integer, pgEnum, pgTable, unique, uuid, varchar } from "drizzle-orm/pg-core";
+import { date, integer, numeric, pgEnum, pgTable, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { clinic } from "./clinic.js";
 
 
@@ -54,7 +54,7 @@ export const pharmMedicine=pgTable("medicine",{
     hsn:varchar("hsn").notNull(),
     purchaseprice:integer("purchaseprice").notNull(),
     sellingprice:integer("sellingprice").notNull(),
-    stock:integer("stock").notNull(),
+    stock:numeric("stock",{ precision: 10,scale: 2,}).notNull().default("0"),
     shelf:varchar("shelf").notNull(),
     totalunit:integer("totalunit").notNull()  , /// how many tablet ina slip eg:paracetomol contain 12 tablet in 1 slip
     priceperunit:integer("priceperunit").notNull()   //// it caluclate per unit price eg:-  10 tabletcost =100rs ...so 1 tablet price is ==> 100/10 (sellingprice/totalunit)

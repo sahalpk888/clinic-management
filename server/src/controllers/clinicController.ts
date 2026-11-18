@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import { uploadImage } from "../services/cloudinaryService.js";
-import { clinic_employeeService, clinic_meService, clinic_registerService, loginService, staff_Service } from "../services/clinicService.js";
+import { clinic_admindashService, clinic_adminStaff_Service, clinic_employeeService, clinic_meService, clinic_registerService, clinic_StaffdetailsService, loginService, patient_FullDetailService, staff_Service, staff_terminateService } from "../services/clinicService.js";
 import jwt from "jsonwebtoken"
 import "dotenv/config";
 import { clinicStaff_Validate } from "../validator/clinicValidator.js";
@@ -81,25 +81,32 @@ export const registerClinic=async(req:Request,res:Response)=>{
 export const clinic_login=async(req:Request,res:Response)=>{
     try{
 
-        const {email,password}=req.body;
+        const {email,password,slug}=req.body;
 
-        const employeeDetails =await loginService({email,password})
+        console.log(slug)
 
-        if (!employeeDetails) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid email or password",
-            });
+        const employeeDetails =await loginService({email,password,slug})
+
+         
+
+       if (!employeeDetails.success) {
+            return res.status(employeeDetails.code === "ACCOUNT_TERMINATED" ? 403 : 401).json({
+                                                                                                success: false,
+                                                                                                message: employeeDetails.message
+                                                                                            });
         }
+
+
+
 
         const tokenValue=jwt.sign(
             {
-              clinicId:employeeDetails.clinicId,
-              role:employeeDetails.role  
+              clinicId:employeeDetails.employeeData.clinicId,
+              role:employeeDetails.employeeData.role  
             },
             process.env.JWT_SECRET!,
             {
-                subject:employeeDetails.id,
+                subject:employeeDetails.employeeData.id,
                 expiresIn:'7d'
             }
         );
@@ -114,7 +121,7 @@ export const clinic_login=async(req:Request,res:Response)=>{
 
         return res.json({
             success:true,
-            message:`Login successfully ${employeeDetails.name}`
+            message:`Login successfully ${employeeDetails.employeeData.name}`
         })
 
 
@@ -124,6 +131,32 @@ export const clinic_login=async(req:Request,res:Response)=>{
         return res.json({
             success:false,
             message:"Clinic_login Failed"
+        })
+    }
+}
+
+
+
+export const clinic_logout=async(req:Request,res:Response)=>{
+    try{
+
+            res.clearCookie("token", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                path: "/",
+            });
+
+            return res.status(200).json({
+                success: true,
+                message: "Logged out successfully",
+            });
+
+    }catch(err){
+        console.log(err)
+        return res.json({
+            success:false,
+            message:"Logout failed"
         })
     }
 }
@@ -213,6 +246,8 @@ export const register_staff=async(req:Request,res:Response)=>{
  }
 
 
+
+ // staff personal page
  export const employee_details=async(req:Request,res:Response)=>{
     try{
 
@@ -233,6 +268,153 @@ export const register_staff=async(req:Request,res:Response)=>{
         return res.json({
              success:false,
                 message:"employee_details Failed"
+        })
+    }
+ }
+
+
+
+ export const staff_details=async(req:Request,res:Response)=>{
+    try{
+
+        const user=req.user!.clinicId;
+
+        const result=await clinic_StaffdetailsService(user);
+
+
+        return res.json({
+            success:true,
+            result
+        })
+
+    }catch(err){
+        console.log(err);
+        return res.json({
+            success:false,
+            message:"staff_details Failed"
+        })
+    }
+ }
+
+
+ export const admin_dash=async(req:Request,res:Response)=>{
+    try{
+
+        const clinic=req.user!.clinicId
+        const user=req.user!.id
+
+        const result =await clinic_admindashService(user,clinic)
+
+        return res.json({
+            success:true,
+            result
+        })
+
+    }catch(err){
+        console.log(err);
+        return res.json({
+            success:false,
+            message:"admin_dash Failed"
+        })
+    }
+ }
+
+
+ export const getStaff_details=async(req:Request,res:Response)=>{
+
+    try{
+
+        const { emp } = req.params;
+        
+        const clinic=req.user!.clinicId
+
+        if (typeof emp !== "string") {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid employee ID",
+            });
+        }
+
+
+        const result=await clinic_adminStaff_Service(emp,clinic)
+
+        return res.json({
+            success:true,
+            result
+        })
+        
+
+    }catch(err){
+        console.log(err)
+
+        return res.json({
+            success:false,
+            message:"getStaff_details Failed"
+        })
+    }
+
+ }
+
+
+ export const getPatient_details=async(req:Request,res:Response)=>{
+    try{
+
+        const {patientid}=req.params; ///use same as router
+        const clinic=req.user!.clinicId
+      
+
+        if (typeof patientid !== "string") {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid employee ID",
+            });
+        }
+
+        const result=await patient_FullDetailService(patientid,clinic)
+
+        return res.json({
+            success:true,
+            result
+        })
+
+    }catch(err){
+        console.log(err)
+
+        return res.json({
+            success:false,
+            message:"getPatient_details Failed"
+        })
+    }
+ }
+
+
+ export const staff_terminate=async(req:Request,res:Response)=>{
+    try{
+        const clinic=req.user!.clinicId
+        const{staffId}=req.params
+
+
+         if (typeof staffId !== "string") {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid employee ID",
+            });
+        }
+
+        const result=await staff_terminateService(staffId,clinic)
+
+        return res.json({
+            success:true,
+            result
+        })
+
+        
+
+    }catch(err){
+        console.log(err)
+        return res.json({
+            success:false,
+            message:"Staff terminate failed"
         })
     }
  }

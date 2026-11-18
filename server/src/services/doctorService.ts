@@ -238,6 +238,30 @@ export const doctor_prescriptionService=async(data:prescriptionInput,clinicIdDat
     
 
     return await db.transaction(async (psx)=>{
+      
+       const TIMEZONE='Asia/kolkata'
+       const today=TZDate.tz(TIMEZONE)
+       const formatteddate=format(today,"yyyy-MM-dd");
+
+      const[visited_id]=await psx
+                            .select({
+                              visitedId:visit.id
+                            })
+                            .from(visit)
+                            .where(
+                              and(
+                                eq(visit.date,formatteddate),
+                                eq(visit.clinicId,clinicIdData),
+                                eq(visit.patientId,patientId)
+                              )
+                            )
+
+          const update_visit=await psx
+                                  .update(visit)
+                                  .set({status:"completed"})
+                                  .where(eq(visit.id, visited_id.visitedId))
+
+
 
       ///1
 
@@ -246,7 +270,8 @@ export const doctor_prescriptionService=async(data:prescriptionInput,clinicIdDat
                                 .values({
                                   diagnosis:condition,
                                   clinicId:clinicIdData,
-                                  patientId
+                                  patientId,
+                                  visitId:visited_id.visitedId
                                 }).returning()
 
 
@@ -356,7 +381,7 @@ export const doctor_prescriptionService=async(data:prescriptionInput,clinicIdDat
 
 export const doctor_getdetailsService=async(date:string,clinicIdData:string)=>{
 
-   const [completecount] = await db
+   const [completecount] = await db  /// it gievs the count of whcih completed the pharamcybill who is in appointment.
                        .select({complete:count()})
                        .from(pharmacyBill)
                        .innerJoin(consultationSchema,eq(consultationSchema.id,pharmacyBill.consultId))

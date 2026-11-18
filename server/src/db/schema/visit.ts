@@ -1,4 +1,4 @@
-import { date, foreignKey, integer, pgTable, time, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import { date, foreignKey, integer, pgTable, time, unique, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 import { patient } from "./patient.js";
 import { clinic } from "./clinic.js";
 
@@ -17,7 +17,7 @@ export const visit=pgTable("visit",{
     /*  this perform a way that each day there is no same token..it prevent the duplication like giving same token numebr.... */
     /* (table) means the current table ..it is written inside this visit table so this table */
 
-
+    
     (table) => ({ 
           dailyTokenUnique: uniqueIndex( "visits_clinicid_visit_date_token_unique")
                              .on(
@@ -25,6 +25,8 @@ export const visit=pgTable("visit",{
                                         table.token,
                                         table.clinicId
                                 ),
+            visitUnique:unique("visit_unique")
+                            .on(table.clinicId,table.id),
 
            patientClinicFK:foreignKey({
                                             columns: [table.clinicId,table.patientId],
