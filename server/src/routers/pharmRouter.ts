@@ -14,7 +14,7 @@ pharmRouter.get('/getmedicine',authenticate,authorize("pharmacist"),pharm_medici
 pharmRouter.get('/bill',authenticate,authorize("pharmacist"),pharm_bill)
 pharmRouter.post('/approve',authenticate,authorize("pharmacist"),pharm_approve)
 pharmRouter.get('/billdetails',authenticate,authorize("pharmacist"),pharm_billdetails)
-pharmRouter.get('/dash',authenticate,authorize("pharmacist","admin"),pharm_dash)
+pharmRouter.get('/dash',authenticate,authorize("pharmacist","admin","doctor"),pharm_dash)
 pharmRouter.get('/dashweek',authenticate,authorize("pharmacist","admin"),pharm_dashweek)
 
 

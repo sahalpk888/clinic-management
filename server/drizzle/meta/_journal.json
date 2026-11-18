@@ -113,6 +113,20 @@
       "when": 1794378334142,
       "tag": "0015_steady_songbird",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794808377846,
+      "tag": "0016_illegal_shinko_yamashiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794849521802,
+      "tag": "0017_dapper_vision",
+      "breakpoints": true
     }
   ]
 }

@@ -1,10 +1,14 @@
-import { and, asc, count, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, count, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
 import { db } from "../db/db.js";
 import { patient } from "../db/schema/patient.js";
 import { queue } from "../db/schema/queue.js";
 import { registerValidInput } from "../validator/receptionValidator.js";
 import { visit } from "../db/schema/visit.js";
 import { clinic } from "../db/schema/clinic.js";
+import { TZDate } from "@date-fns/tz";
+import { addDays, formatDate, startOfWeek } from "date-fns";
+import { pharmacyBill } from "../db/schema/pharmacyBill.js";
+import { consultationSchema } from "../db/schema/consultation.js";
 
 
 
@@ -423,5 +427,67 @@ export const new_booking=async(singlePerson:newBooking,timeAppoint:string,select
             booking_new
           }
   })
+
+}
+
+
+export const receptionist_dashService=async(clinicIdData:string)=>{
+  const TIMEZONE="Asia/Kolkata"
+      const today=TZDate.tz(TIMEZONE)
+      const formatteddate=formatDate(today,"yyyy-MM-dd");
+  
+  
+      const monday=startOfWeek(today,{ ///to get monday,,regardkless what today is if today=tuesday nov-12 then monday=nov-11..it gives the week monday date
+        weekStartsOn:1
+      })
+  
+      const end=addDays(monday,7)
+  
+    const [visited]=await db
+                          .select({
+                            total:count(),
+                           
+                          })
+                          .from(visit)
+                          .where(
+                            and(
+                              eq(visit.date,formatteddate),
+                              eq(visit.clinicId,clinicIdData)
+  
+                            )
+                          )
+      const [appointmentcount]=await db
+                                    .select({
+                                      appoitcount:count()
+                                    })
+                                    .from(visit)
+                                    .where(
+                                      and(
+                                        eq(visit.date,formatteddate),
+                                        eq(visit.clinicId,clinicIdData),
+                                        isNotNull(visit.appoitTime)
+                                      )
+                                    )
+        const [completecount] = await db  /// it gievs the count of whcih completed the pharamcybill who is in appointment.
+                                 .select({complete:count()})
+                                 .from(pharmacyBill)
+                                 .innerJoin(consultationSchema,eq(consultationSchema.id,pharmacyBill.consultId))
+                                 .innerJoin(patient,eq(patient.id,consultationSchema.patientId))
+                                 .innerJoin(visit,eq(visit.patientId,patient.id))
+                                 .where(and(
+                                    eq(visit.date,formatteddate),
+                                    eq(pharmacyBill.status,"completed"),
+                                    isNotNull(visit.appoitTime),
+                                    eq(pharmacyBill.clinicId,clinicIdData)))
+
+
+          return {
+              visited,
+              appointmentcount,
+              completecount,
+              waiting:appointmentcount.appoitcount-completecount.complete,
+   
+          }
+  
 
 }
