@@ -18,4 +18,5 @@
 
  /*  "include": ["server.ts","src", "drizzle.config.ts"] */
    "include": ["**/*.ts","**/*.d.ts"],
+   "exclude": ["node_modules", "dist"]
 }
