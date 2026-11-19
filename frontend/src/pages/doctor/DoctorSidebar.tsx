@@ -1,5 +1,8 @@
 import { NavLink, Outlet } from "react-router-dom"
 import { assets } from "../../assets/assets"
+import { useAppContext } from "../../context/Appcontext"
+import { useState } from "react"
+import api from "../../api/api"
 
 
 interface Detail{
@@ -17,12 +20,35 @@ const Sidebar = () => {
 
     ]
 
+       const{logo,setOwner,navigate}=useAppContext()
+        const [loading, setLoading] = useState(false);
+    
+        const ok=async()=>{
+            try{
+                const resp=await api.post('/api/clinic/logout')
+    
+                    if(resp.data.success){
+                        setOwner(null)
+                       navigate('/login')
+    
+                    }
+            }
+            catch(err){
+                console.log(err)
+            }
+            finally{
+                setLoading(false)
+            }
+    
+    
+        }
+
   return (
     <div className="flex  min-h-screen ">
         
         <div className="w-64  flex flex-col bg-ink">
             <div className=" mx-auto mt-10">
-                <img src={assets.logo} className="w-30 h-20"/>
+                <img src={logo} className="w-30 h-20 rounded-sm"/>
             </div>
             <div className="mt-10">
                 {
@@ -33,6 +59,9 @@ const Sidebar = () => {
                     ))
                 }
             </div>
+                            <div className='mx-auto mt-50  '>
+                                <button onClick={ok} disabled={loading} className='bg-red-900 w-20 h-10 rounded text-sm text-white cursor-pointer hover:bg-red-200 '>{loading?"Logging out...":"Log out"}</button>
+                            </div>
 
         </div>
 

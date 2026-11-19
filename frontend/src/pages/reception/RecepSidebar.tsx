@@ -1,8 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { assets } from '../../assets/assets'
+import api from '../../api/api'
+import { useAppContext } from '../../context/Appcontext'
 
 const RecepSidebar = () => {
+
+    const{logo,setOwner,navigate}=useAppContext()
+      const [loading, setLoading] = useState(false);
 
 
     const items=[
@@ -15,14 +20,35 @@ const RecepSidebar = () => {
     ]
 
 
+    const ok=async()=>{
+        try{
+            const resp=await api.post('/api/clinic/logout')
+
+                if(resp.data.success){
+                    setOwner(null)
+                   navigate('/login')
+
+                }
+        }
+        catch(err){
+            console.log(err)
+        }
+        finally{
+            setLoading(false)
+        }
+
+
+    }
+
+
 
   return (
-    <div className='flex min-h-screen'>
+    <div className=' flex min-h-screen'>
 
-        <div className='w-64 bg-slate-900 flex flex-col '>
+        <div className='w-64  bg-slate-900 flex flex-col'>
 
                     <div className="mx-auto mt-10">
-                        <img src={assets.logo} className="w-30 h-20"/>
+                        <img src={logo} className="w-30 h-20 rounded-sm"/>
                     
                     </div>
 
@@ -36,6 +62,11 @@ const RecepSidebar = () => {
 
                             ))
                         }
+                </div>
+
+
+                <div className='mx-auto mt-50  '>
+                    <button onClick={ok} disabled={loading} className='bg-red-900 w-20 h-10 rounded text-sm text-white cursor-pointer hover:bg-red-200 '>{loading?"Logging out...":"Log out"}</button>
                 </div>
         </div>
 

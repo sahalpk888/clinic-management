@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import api from '../../api/api'
+import { useAppContext } from '../../context/Appcontext';
 
 
 
@@ -27,6 +28,8 @@ interface PatientResponse{
 
 
 const DoctorHistory = () => {
+
+  const {navigate}=useAppContext()
 
   const [search,setSearch]=useState("")
    const [currentPage,setCurrentpage]=useState(1);
@@ -187,7 +190,7 @@ const DoctorHistory = () => {
                 <td className='p-2 border'>{pro.age}</td>
                 <td className='p-2 border'>{pro.gender}</td>
                 <td className='p-2 border'>{pro.phone}</td>
-                <td className='p-2 border'> <span className='text-slate-400 hover:text-slate-700 cursor-pointer'>click here</span> </td>
+                <td className='p-2 border'> <span className='text-slate-400 hover:text-slate-700 cursor-pointer' onClick={(e)=>navigate(`/clinic/patient/${pro.id}`)} >click here</span> </td>
               </tr>
             ))
            }

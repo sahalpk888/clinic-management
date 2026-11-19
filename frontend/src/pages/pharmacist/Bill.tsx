@@ -89,11 +89,26 @@ const Bill = () => {
   }
 
 
-  const updatePayemnt=(patientamount:number)=>{
-    setPaymentMethod({
+  const updatePayemnt=(amount:number)=>{
+
+    if (!bill) return;
+
+  const total = Number(bill.amount);
+
+  const enteredAmount = Math.min(
+    Math.max(amount, 0),
+    total
+  );
+
+  setPaymentMethod({
+    cash:selectedmethod === "cash"? enteredAmount: total - enteredAmount,
+    upi:selectedmethod === "upi" ? enteredAmount: total - enteredAmount,
+  });
+  
+/*     setPaymentMethod({
       cash:selectedmethod === "cash" ? patientamount : bill ? bill.amount - patientamount : 0,
       upi:selectedmethod === "upi" ? patientamount : bill ? bill.amount - patientamount : 0
-    })
+    }) */
     setShowDisplay(true)
 
 
@@ -195,7 +210,7 @@ const Bill = () => {
                                                       <option value="upi">UPI</option>
                                                     
                                                     </select>
-                                                      <input value={paymentMethod[selectedmethod]} onChange={(e)=>updatePayemnt(Number(e.target.value))} className='border absolute top-62 p-1 ml-2 w-20'/>
+                                                      <input type='number' min="0"  max={bill?.amount ?? 0} value={paymentMethod[selectedmethod]} onChange={(e)=>updatePayemnt(Number(e.target.value))} className='border absolute top-62 p-1 ml-2 w-20'/>
                                                        {
                                                          showDisplay && (
                                                            <div className='absolute right-10 bg-emerald-200 p-10   '>

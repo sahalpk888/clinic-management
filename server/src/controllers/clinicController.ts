@@ -224,11 +224,14 @@ export const register_staff=async(req:Request,res:Response)=>{
 
         return res.json({
             user:{
-                id:result?.id,
-                clinincId:result?.clinicId,
-                role:result?.role,
-                name:result?.name,
-                email:result?.email
+                id:result.employeeData?.id,
+                clinincId:result.employeeData?.clinicId,
+                role:result.employeeData?.role,
+                name:result.employeeData?.name,
+                email:result.employeeData?.email
+            },
+            logo:{
+                logo:result.logo
             }
         })
 

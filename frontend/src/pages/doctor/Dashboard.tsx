@@ -15,6 +15,12 @@ interface Chartinfo{
   amount:number
 }
 
+
+interface MedcineTOP{
+  medicinename:string,
+  sold:number
+}
+
 const Dashboard = () => {
 
   const[totalPatient,setTotalPatient]=useState(0)
@@ -33,6 +39,8 @@ const Dashboard = () => {
     { name: "46-59", count: 0 },
     { name: "60+", count: 0 },
   ]);
+
+  const [topmedicine,setTopMedicine]=useState<MedcineTOP[]>([]) 
 
 
   const items:Chartinfo[]=[
@@ -54,15 +62,7 @@ const COLORS = [
 
 
 
-const topmedicine=[   
-    { name: 'Paracetamol', sold: 86 },
-    { name: 'Amoxicillin', sold: 64 },
-    { name: 'Cetirizine', sold: 51 },
-    { name: 'Ibuprofen', sold: 47 },
-    { name: 'Omeprazole', sold: 38 },
-    { name: 'Metformin', sold: 29 },
-   
-  ]
+
 
 
 
@@ -114,6 +114,10 @@ const topmedicine=[
     const hello=async()=>{
       try{
         const resp=await api.get('/api/dr/dashdoctor')
+        const response=await api.get('/api/pharm/dash');
+         setTopMedicine(response.data.result.medicineChart)
+
+
         console.log(resp)
         setTotalPatient(resp.data.result.totalpatient.total)
         setGender({
@@ -146,28 +150,17 @@ const topmedicine=[
           
         </div>
 
-        <div className='mt-10 flex flex-col  border border-slate-200 rounded '>
-          <div className='flex justify-between p-10'>
-            <p className='text-2xl   font-semibold'> Cases</p>
-            <select className='bg-emerald-400 p-2 rounded-2xl '>
-              <option value="today">Today</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-          </div>
-            <div className='flex justify-end w-full '>
-              <button className='bg-green-300 p-2 m-10 w-50 h-10 font-semibold cursor-pointer hover:bg-green-700 rounded-full'>AI sumamrize patient</button>
-            </div>
-            
+               <div className='border border-slate-200 mt-10'>
 
+         <p className='text-xl m-5 font-bold'>Medicine Prescribed :</p>
 
-            <ResponsiveContainer width='100%' height={320} >
-              <BarChart data={sortedOrder}>
-                <XAxis dataKey='name' tick={{fontSize:12}} angle={-12} />
+         <ResponsiveContainer width='100%' height={320} >
+              <BarChart data={topmedicine}>
+                <XAxis dataKey='medicinename' tick={{fontSize:12}} angle={-12} />
                 <YAxis tick={{fontSize:12}} />
 
                 <Tooltip content={shalu} />
-                <Bar dataKey="amount" name="count"  fill="#4f46e5" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="sold" name="unit sold"  fill="#4f46e5" radius={[6, 6, 0, 0]} />
 
 
 
@@ -180,8 +173,12 @@ const topmedicine=[
 
             </ResponsiveContainer>
 
-        
-        </div>
+
+
+
+       </div>
+
+       
 
 
 
@@ -262,33 +259,7 @@ const topmedicine=[
 
 
 
-       <div className='border border-slate-200 mt-10'>
 
-         <p className='text-xl m-5 font-bold'>Medicine Prescribed :</p>
-
-         <ResponsiveContainer width='100%' height={320} >
-              <BarChart data={sortedWAYFORMEDICINE}>
-                <XAxis dataKey='name' tick={{fontSize:12}} angle={-12} />
-                <YAxis tick={{fontSize:12}} />
-
-                <Tooltip content={shalu} />
-                <Bar dataKey="sold" name="unit sold"  fill="#4f46e5" radius={[6, 6, 0, 0]} />
-
-
-
-
-
-
-              </BarChart>
-
-
-
-            </ResponsiveContainer>
-
-
-
-
-       </div>
 
 
         
