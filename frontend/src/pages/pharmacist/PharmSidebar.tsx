@@ -40,7 +40,7 @@ updatedAt
 
     ]
 
-    const{setOwner,navigate}=useAppContext()
+    const{logo,setOwner,navigate}=useAppContext()
     const [loading, setLoading] = useState(false);
 
     const ok=async()=>{
@@ -71,7 +71,7 @@ updatedAt
         <div className="w-64  flex flex-col bg-ink">
             
                         <div className=" mx-auto mt-10">
-                            <img src={assets.logo} className="w-30 h-20"/>
+                            <img src={logo} className="w-30 h-20 rounded-sm"/>
                         </div>
 
                         <div className="mt-10">

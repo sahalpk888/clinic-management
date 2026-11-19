@@ -14,7 +14,7 @@ const AdminSidebar = () => {
         {name:"Staff info",path:'/admin/info'},
     ]
 
-        const{setOwner,navigate}=useAppContext()
+        const{logo,setOwner,navigate}=useAppContext()
         const [loading, setLoading] = useState(false);
 
     const ok=async()=>{
@@ -42,7 +42,7 @@ const AdminSidebar = () => {
     <div className=' flex min-h-screen'>
         <div className='w-64 bg-slate-900 flex flex-col'>
               <div className="mx-auto mt-10">
-                                      <img src={assets.logo} className="w-30 h-20"/>
+                                      <img src={logo} className="w-30 h-20 rounded-sm"/>
                                   
                 </div>
                <div className='mt-10'>

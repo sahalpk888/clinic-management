@@ -8,5 +8,6 @@ export interface Owner{
         clinincId:string,
         role:Role,
         name:string,
-        email:string
+        email:string,
+
 }

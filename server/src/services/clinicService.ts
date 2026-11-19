@@ -172,7 +172,8 @@ export const loginService=async(data:loginDetail):Promise<LoginResult>=>{
 
   return{
     success:true,
-   employeeData   
+   employeeData,
+  
 
   }      //// (method-1) this send to controller eg:we can use in const employeeDetails= await loginService() ====> employeeDetails.clincId
         /// return {employeeData}   /// (method-2) this send to controller eg:we can use in const employeeDetails= await loginService() ====> employeeDetails.employeeData.clincId
@@ -258,12 +259,24 @@ export const clinic_meService=async(employeeiddata:string,clinicIddata:string)=>
                   clinicId:true,
                   role:true,
                   name:true,
-                  email:true
+                  email:true,
+                  
                 }
         })
 
+        const [logo]=await db
+                         .select({logo:clinic.logoUrl})
+                         .from(clinic)
+                         .where(eq(clinic.id,clinicIddata))
 
-        return employeeData
+                         
+
+
+        return{
+          employeeData,
+          logo
+
+        } 
 
 }
 

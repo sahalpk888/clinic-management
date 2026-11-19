@@ -66,8 +66,8 @@ function App() {
   return (
     <>
      <Routes>
-              <Route path='/' element={<LandingPage/>}  />
-              <Route path='/home' element={<Home/>}  />
+             {/*  <Route path='/' element={<LandingPage/>}  /> */}
+              <Route path='/' element={<Home/>}  />
               <Route path='/test' element={<Test/>}  />
               <Route path='/test2' element={<Test2/>}  />
          

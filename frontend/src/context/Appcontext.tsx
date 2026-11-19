@@ -45,6 +45,10 @@ interface AppContextType {
  logout: ()=>void
  registerStaff:(data:FormData)=>Promise<void>;
 
+  logo:string;
+ setLogo:React.Dispatch<React.SetStateAction<string>>;
+
+
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -69,6 +73,7 @@ export const AppContextProvider = ({
    const[medicineDetails,setMedicineDetails]=useState<PharmMedicine | null>(null);
 
    const[owner,setOwner]=useState<Owner | null>(null);
+   const[logo,setLogo]=useState<string>("")
    const [authLoading, setAuthLoading] = useState(true);
 
 
@@ -93,7 +98,9 @@ export const AppContextProvider = ({
       try{
 
         const res=await api.get('api/clinic/me');
+        console.log(res)
          setOwner(res.data.user)
+         setLogo(res.data.logo.logo.logo)
 
 
       }catch(err){
@@ -146,7 +153,9 @@ export const AppContextProvider = ({
     authLoading,
     registerClinic,
     logout,
-    registerStaff
+    registerStaff,
+    logo,
+    setLogo
   };
 
 

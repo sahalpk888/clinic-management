@@ -12,7 +12,12 @@ import type { Owner } from "../types/owner";
 
 
 interface meResponse{
-  user:Owner
+  user:Owner,
+  logo:{
+    logo:{
+      logo:string
+    }
+  }
 }
 
 
@@ -22,7 +27,7 @@ const Login = () => {
 
 
 
-  const{owner,setOwner,navigate}=useAppContext()
+  const{setLogo,owner,setOwner,navigate}=useAppContext()
 
 
   const [email, setEmail] = useState("");
@@ -50,6 +55,8 @@ const Login = () => {
           // 2. Fetch authenticated user details
           const me = await api.get<meResponse>("/api/clinic/me");
           const user=me.data.user
+          const logoss=me.data.logo.logo.logo
+          setLogo(logoss)
 
           // 3. Update AppContext
           setOwner(me.data.user);
