@@ -109,8 +109,7 @@ export const doctor_consultService=async(year:number,month:number,clinicIdData:s
                     .where(         
                       and(
                         sql `${visit.date} >= ${startDate} 
-                            AND ${visit.date} < ${endDate}
-                            AND ${visit.status}='waiting' `,
+                            AND ${visit.date} < ${endDate} `,
                         eq(visit.clinicId,clinicIdData)
                       )
                     )
