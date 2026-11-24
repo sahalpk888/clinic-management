@@ -127,7 +127,7 @@ export const loginService=async(data:loginDetail):Promise<LoginResult>=>{
         };
       }
 
-      const employeeData=await db.query.employee.findFirst({   /// here employee is table name
+      const employeeData=await db.query.employee.findFirst({   
         where:and(
           eq(employee?.email,data.email),
           eq(employee.clinicId,clinicData.id)
@@ -175,19 +175,15 @@ export const loginService=async(data:loginDetail):Promise<LoginResult>=>{
    employeeData,
   
 
-  }      //// (method-1) this send to controller eg:we can use in const employeeDetails= await loginService() ====> employeeDetails.clincId
-        /// return {employeeData}   /// (method-2) this send to controller eg:we can use in const employeeDetails= await loginService() ====> employeeDetails.employeeData.clincId
+  }      
 }
-
-
-                                 ///////// EMPLOYEE REGISTERATION &&&&######
 
 
 
 interface userDetials{
-    id: string, // this is admin id ..it will chnage we dont need this 
-    clinicId: string,  ///need only this 
-    role:string ///role of the admin , role:"admin"
+    id: string, 
+    clinicId: string,  
+    role:string 
 }
 
 export const staff_Service=async(data:staffRegisterInput,clinicData:userDetials)=>{
@@ -197,11 +193,11 @@ export const staff_Service=async(data:staffRegisterInput,clinicData:userDetials)
   return await db.transaction(async(esx)=>{
      
      //1
-      const generate_firsttime_password=generatePassword()  //generate random password for temporary
+      const generate_firsttime_password=generatePassword()  
       const passwordhash=await bcrypt.hash(generate_firsttime_password,10);
 
     //2
-      const emp_id=await generateId("EMP")   /// generateId comes from util/generateID.ts
+      const emp_id=await generateId("EMP")   
 
 
     //3
@@ -212,7 +208,6 @@ export const staff_Service=async(data:staffRegisterInput,clinicData:userDetials)
                                   emp:emp_id,
                                   name:data.name,
                                   email:data.email,
-                                  //passwordHash:generate_firsttime_password,
                                   passwordHash:passwordhash,
                                   role:data.role
                              })
@@ -254,7 +249,7 @@ export const clinic_meService=async(employeeiddata:string,clinicIddata:string)=>
                             eq(employee.clinicId,clinicIddata)
                           ),
 
-                columns:{                   /* we use cloumn when we use findfirst...if all thing in one table and we need specific one we use this else...we if different table we use innerjoin */
+                columns:{                  
                   id:true,
                   clinicId:true,
                   role:true,
@@ -342,7 +337,7 @@ export const clinic_admindashService=async(adminId:string,clinicIdData:string)=>
     const formatteddate=formatDate(today,"yyyy-MM-dd");
 
 
-    const monday=startOfWeek(today,{ ///to get monday,,regardkless what today is if today=tuesday nov-12 then monday=nov-11..it gives the week monday date
+    const monday=startOfWeek(today,{ 
       weekStartsOn:1
     })
 
@@ -374,7 +369,7 @@ export const clinic_admindashService=async(adminId:string,clinicIdData:string)=>
                                     )
                                   )
 
-                                  //console.log(appointmentcount)
+                                
 
   const [revenue]=await db 
                        .select({
@@ -389,7 +384,7 @@ export const clinic_admindashService=async(adminId:string,clinicIdData:string)=>
                        //console.log(revenue)
 
 
-   const [completecount] = await db  /// it gievs the count of whcih completed the pharamcybill who is in appointment.
+   const [completecount] = await db  
                          .select({complete:count()})
                          .from(pharmacyBill)
                          .innerJoin(consultationSchema,eq(consultationSchema.id,pharmacyBill.consultId))
@@ -426,8 +421,6 @@ export const clinic_admindashService=async(adminId:string,clinicIdData:string)=>
                             revenue: Number(itm?.revenue_countweek ?? 0),
                           }
                     })
-
-                    //console.log(weekly_revenue)
 
                                                        
 
@@ -474,7 +467,7 @@ export const clinic_adminStaff_Service=async(emp:string,clinicIdData:string)=>{
                       .limit(1)
 
 
-        return staff ?? null   // this means if staff is there return it else return null
+        return staff ?? null   
 
 }
 

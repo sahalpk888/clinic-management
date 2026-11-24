@@ -52,16 +52,16 @@ const Login = () => {
       console.log(response)
       
 
-          // 2. Fetch authenticated user details
+
           const me = await api.get<meResponse>("/api/clinic/me");
           const user=me.data.user
           const logoss=me.data.logo.logo.logo
           setLogo(logoss)
 
-          // 3. Update AppContext
+    
           setOwner(me.data.user);
           
-          // 4 Default dashboard according to role
+
           const defaultRoutes:Record<Role,string> = {
             admin: "/admin",
             doctor: "/doctor",
@@ -70,8 +70,8 @@ const Login = () => {
           };
 
           // 5  Redirect to previous page
-          const from = location.state?.from?.pathname ;                          ////this comes form Protectedroute.tsx...
-          navigate(from || defaultRoutes[user.role], { replace: true });         ///naviagte to corresponsing page eg:admin logi means admin page
+          const from = location.state?.from?.pathname ;                         
+          navigate(from || defaultRoutes[user.role], { replace: true });         
 
 
 
@@ -87,7 +87,7 @@ const Login = () => {
 
 
 
-  useEffect(() => {   ///redirect directly to dashabord if already loggedin
+  useEffect(() => {   
     if (owner) {
       const dashboardRoutes: Record<Role, string> = {
         admin: "/admin",

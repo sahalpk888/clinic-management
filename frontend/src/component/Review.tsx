@@ -27,15 +27,7 @@ const Review = () => {
   ];
 
 
-    const ROLE_CARDS = [
-        { tag: "ROLE / ADMIN", title: "Owner's view", body: "Full visibility across patients, revenue and staff. Approves leave, salary changes and new logins." },
-        { tag: "ROLE / DOCTOR", title: "Consultation workspace", body: "Diagnosis, e-prescriptions, clinical notes and follow-up scheduling in one screen per patient." },
-        { tag: "ROLE / RECEPTIONIST", title: "Front-of-house control", body: "Registers patients, books appointments and runs the live queue board." },
-        { tag: "ROLE / PHARMACIST", title: "Dispensing counter", body: "Receives prescriptions automatically, checks rack stock and expiry, prints the invoice." },
-        { tag: "ROLE / STAFF", title: "Personal record", body: "Attendance, leave requests and schedule — optional role for larger clinics." },
-    ];
 
-    
 
 
   return (

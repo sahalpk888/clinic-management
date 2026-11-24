@@ -56,7 +56,7 @@ const Appointment = () => {
             
             if(todayDate===1){
 
-                  const lastmonthLastdate=new Date(currentYear,currentMonth,0).getDate()   ///get last month last date eg:this month is september means last month august last date is 31 th
+                  const lastmonthLastdate=new Date(currentYear,currentMonth,0).getDate()  
                   
                   setcurrentMonth((prev)=>prev-1);
                   settodayDate(lastmonthLastdate)

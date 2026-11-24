@@ -11,13 +11,8 @@ interface pharmacyMedicine{
   name:string
 }
 
-                                                  //////////////////main    in app.tsx we props to get clinicname anddr anme
-const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescription",}: DoctorProps) => {            
-
-             /*  const makeId = () =>
-              typeof crypto !== "undefined" && "randomUUID" in crypto
-                ? crypto.randomUUID()
-                : `${Math.random().toString(5).slice(2)}` */
+                                               
+const Doctor = () => {            
 
 
               const emptyMedicine=(sno:number):Medicine=>({
@@ -41,12 +36,17 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
 
               })
 
-              const [medicines, setMedicines] = useState<Medicine[]>([]);  //const emptyMedicine=(sno:number):Medicine  we need to pass one value..that is sno
-              const [allmedicine,setAllMedicine]=useState<pharmacyMedicine[]>([]) ///backened send all medicine names and id
-              const [activeMedicineId, setActiveMedicineId] = useState<string | null>(null); ///this is sused for focus.like for first row the medicine list comes below first row  and for second row the medcine suggestion comes below second row likewise..
+              const [clinicDetails,setClinicDetails]=useState({
+                name:"",
+                doctor:""
+              })
+
+              const [medicines, setMedicines] = useState<Medicine[]>([]);  
+              const [allmedicine,setAllMedicine]=useState<pharmacyMedicine[]>([]) 
+              const [activeMedicineId, setActiveMedicineId] = useState<string | null>(null); 
               const[condition,setCondition]=useState("")
 
-              const nameInputRef  = useRef<Record<string,HTMLInputElement | null>>({});   /// it is used for store the input to fous eg:- "abc123":medine input
+              const nameInputRef  = useRef<Record<string,HTMLInputElement | null>>({});   
               const timeInputRef  = useRef<Record<string,HTMLInputElement | null>>({});
               const durationInputRef  = useRef<Record<string,HTMLInputElement | null>>({});
               const lastAddedId =useRef<string | null>(null);
@@ -57,25 +57,18 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
               const addmedicine=()=>{
 
                     setMedicines((prev)=>{
-                      const next = [...prev, emptyMedicine(prev.length + 1)]; /*  emptyMedicine(prev.length + 1)...here (prev.lenght+1) gives the sno */
-                      lastAddedId.current = next[next.length - 1].rowid;     ///here legnth starts with 1 but array starts with 0 so to get last added when do next.lenght-1  
-                      return next;                                           ///after getting the last added TAKE ITS "sno".
+                      const next = [...prev, emptyMedicine(prev.length + 1)];
+                      lastAddedId.current = next[next.length - 1].rowid;     
+                      return next;                                         
                     })
               }
 
-                   /*   explanation of addmedicine,nameInputRef,timeInputRef,durationInputRef &&  handleNameEnter, handleTimeEnter,handleNextLineEnter    */
-                         /* here the nameinputref,timeref,durationref is used for focus the input so that it is easeier to type 
-                           --> el means that particular input eg: abc123 for this input,xyz321 for anoher input
-                           --> lastaddedId stores the new created row "id"...
-                           -->using useeffect we try to focus on new row ..nameinputref focus the medicine name input by using lastaddedid we focus th correct new added row 
-                         
-                         */
               
 
               useEffect(() => {
                   if (lastAddedId.current) {
-                    nameInputRef.current[lastAddedId.current]?.focus();   ///here whenever new input comes its ID stores it in nameinputRef. then  Id is stored in lastaddedref is same as ID in nameinputRef so.. the both is not connected but has same value
-                    lastAddedId.current = null;                          //eg: nameInputRef="abc"=medine input    lastAddedid="abc" ....here both id is same
+                    nameInputRef.current[lastAddedId.current]?.focus();   
+                    lastAddedId.current = null;                          
                   }
                 }, [medicines.length]);
 
@@ -84,7 +77,13 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
                   const sahal=async()=>{
                     try{
                        const resp=await api.get('/api/dr/medicinelist');
-                       setAllMedicine(resp.data.getDetails)
+                       console.log(resp)
+                       setAllMedicine(resp.data.getDetails.hello)
+                       setClinicDetails({
+                         name:resp.data.getDetails.clinic_details.clinicName,
+                         doctor:resp.data.getDetails.clinic_details.drName
+                       })
+
 
                     }catch(err){
                       console.log(err)
@@ -97,7 +96,7 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
 
                 
 
-                  const handleNameEnter=(e:KeyboardEvent<HTMLInputElement>,id:string)=>{  //this point to time consue when we click enter in  "medicine name" <input/>
+                  const handleNameEnter=(e:KeyboardEvent<HTMLInputElement>,id:string)=>{ 
                     if(e.key==="Enter"){
                       e.preventDefault();
                       timeInputRef.current[id]?.focus()
@@ -105,27 +104,22 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
 
                   }
 
-                  const handleTimeEnter=(e:KeyboardEvent<HTMLInputElement>,id:string)=>{   //"This is a keyboard event that happened on an <input> element."
+                  const handleTimeEnter=(e:KeyboardEvent<HTMLInputElement>,id:string)=>{   
                         if (e.key=== "Enter"){  
-                          e.preventDefault()   ///when usig keyboard like here "Enter"...make sure to use this lines else page refresh happpens
+                          e.preventDefault()   
                           durationInputRef.current[id]?.focus()
                         }
                   }  
 
-                  const handleNextLineEnter=(e:KeyboardEvent<HTMLInputElement>,id:string)=>{   ///this will make to create another row when click enter in duration input
+                  const handleNextLineEnter=(e:KeyboardEvent<HTMLInputElement>,id:string)=>{   
                     if(e.key === "Enter"){
                       e.preventDefault();
-                      addmedicine()  /// a function used in above to create a new row
+                      addmedicine()  
 
                     }
                   }
 
                   const ok=async()=>{
-
-                    //onNext({patientDetails:patient,medicineDetails:medicines,condition});      ///sending data to app.tsx
-
-                    //console.log(condition)
-                    //console.log(medicines);
 
                     try{
 
@@ -161,7 +155,7 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
 
                    
 
-                  const updateMedicine=(rowid:string,field:keyof Medicine ,value:string)=>{    ///method-1
+                  const updateMedicine=(rowid:string,field:keyof Medicine ,value:string)=>{   
                     setMedicines((prev)=>
                       prev.map((m)=>(
                         m.rowid === rowid ?  {...m,[field]:value} : m
@@ -169,17 +163,6 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
                     )
 
                   }
-                  /* const updateMedicine=(id:string,field:keyof Medicine ,value:string)=>{
-                    setMedicines((prev)=>
-                    {
-                      return prev.map((m)=>(                                     ///method-2 (here after prev we use {} so inside mention return else wrong)
-                        m.id === id ?  {...m,[field]:value} : m
-                      ))
-                    }
-                    )
-
-                  } */
-
 
                     const tokenEnter=async(e:KeyboardEvent<HTMLInputElement>,tkn:number)=>{
                       console.log(tkn)
@@ -227,9 +210,9 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
                   <div className="bg-paper w-200 min-h-150 mx-auto rounded-2xl  ">
 
                       <div className="w-full bg-teal-700 rounded-2xl p-5 text-white ">
-                          <p className="text-xl font-medium uppercase ">{clinicName}</p>
-                          <p className="text-xl font-semibold">{doctorName}</p>
-                        
+                          <p className="text-xl font-medium uppercase ">Clinic: {clinicDetails?.name}</p>
+                          <p className="text-xl font-semibold">Dr :{clinicDetails?.doctor}</p>
+                      
                         
                       </div>
 
@@ -252,7 +235,7 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
                             </div>
 
                         <div className="grid grid-cols-4 gap-3 mx-5 mt-2 ">   
-                            <Field label="Patient Name" className="col-span-2">  {/* Field is described at bottom of this code */}
+                            <Field label="Patient Name" className="col-span-2">  
                             <input
                              value={patient.name}
                               onChange={(e) => updatePatient("name", e.target.value)}
@@ -279,7 +262,7 @@ const Doctor = ({  onNext,  doctorName="Dr. —", clinicName = "Digital Prescrip
                               </select>
                           </Field>    
                         
-                          <Field label="Patient Id:" >  {/* Field is described at bottom of this code */}
+                          <Field label="Patient Id:" >  
                             <input
                              value={patient.id}
                              onChange={(e) => updatePatient("id", e.target.value)}

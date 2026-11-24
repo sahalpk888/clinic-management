@@ -30,9 +30,9 @@ const Nav = () => {
              </NavLink>
             
             <div className="">
-                <a href="#platform" className={'text-primary  px-5'}>Platform</a>   {/* brings to top page */}
+                <a href="#platform" className={'text-primary  px-5'}>Platform</a>   
                 <a href='#aboutus'  className={'text-primary px-5'}>About us</a>
-                <a href='#foryourteam'  className={'text-primary px-5'}>For your team</a>  {/* brings to home page */}
+                <a href='#foryourteam'  className={'text-primary px-5'}>For your team</a>  
 
             </div>
 

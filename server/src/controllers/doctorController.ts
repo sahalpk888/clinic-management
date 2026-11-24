@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { docotor_AppointService, doctor_consultService, doctor_dashService, doctor_getdetailsService, doctor_prescriptionService, doctor_tokenService, doctor_totalService, getmedicinelistService } from "../services/doctorService.js";
 import { docotr_prescriptionValidate } from "../validator/doctorValidate.js";
+import { clinic } from "../db/schema/clinic.js";
 
 
 
@@ -12,10 +13,8 @@ export const doctor_appoitmentDetails=async(req:Request,res:Response)=>{
         const user=req.user!.clinicId
 
         const {date}=req.query;
-        
-        //console.log(date)
 
-        if (typeof date !== "string") {  /* it is must else sonct result gives error.because we dont know the frontned send which type  */
+        if (typeof date !== "string") {   
             return res.status(400).json({
                 success: false,
                 message: "Date is required",
@@ -154,8 +153,11 @@ export const doctor_medicineList=async(req:Request,res:Response)=>{
     try{
 
         const user=req.user!.clinicId
+
         
         const getDetails=await getmedicinelistService(user);
+
+
          
         return res.json({
             success:true,
@@ -177,9 +179,8 @@ export const doctor_prescription=async(req:Request,res:Response)=>{
 
         const user=req.user!.clinicId
 
-       // console.log(req.body)
         const validatePrescription=docotr_prescriptionValidate.safeParse(req.body);
-        //console.log(validatePrescription)
+    
 
         if(!validatePrescription.success){
             return res.json({
@@ -236,7 +237,7 @@ export const doctor_getdetails=async(req:Request,res:Response)=>{
 
 export const doctor_dash=async(req:Request,res:Response)=>{
     try{
-        //const authHeader = req.headers.authorization;
+       
 
         const user=req.user!.clinicId
 

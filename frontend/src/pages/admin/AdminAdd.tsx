@@ -55,7 +55,7 @@ const AdminAdd = () => {
   const okie=async()=>{
 
     try{
-         console.log(add)
+         
 
           const formdata=new FormData()
 
@@ -63,9 +63,9 @@ const AdminAdd = () => {
                 formdata.append(Key,value)     /// 1
           });
 
-          console.log(formdata)
+          
 
-          await registerStaff(formdata)    //// api.post(......)
+          await registerStaff(formdata)    
 
     }catch(err){
       console.log(err)

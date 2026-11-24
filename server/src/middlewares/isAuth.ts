@@ -26,7 +26,7 @@ export const authenticate=(req:Request,res:Response,next:NextFunction)=>{
 
           //3. Validate payload
             if (typeof decoded === "string" ||!decoded.sub ||!decoded.clinicId ||
-                !["admin","receptionist","doctor","pharmacist"].includes(decoded.role))     ///we expect liek this {..} so if random string menas return error ..
+                !["admin","receptionist","doctor","pharmacist"].includes(decoded.role))     
             {
                 return res.status(401).json({
                     success: false,
@@ -35,7 +35,7 @@ export const authenticate=(req:Request,res:Response,next:NextFunction)=>{
             }
 
             // 4. Attach user to request
-                req.user = {                         ///in express.d.ts we declared user for request...actually req contain only params,query,body but we are addig one more 
+                req.user = {                         
                     id: decoded.sub,
                     clinicId: decoded.clinicId,
                     role: decoded.role as Role,

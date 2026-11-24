@@ -45,21 +45,10 @@ const SHEET_GAP = 0; // mm
 
 
 const KEYS = {
-  sheet: "medlabel:sheetItems",    ///name of the localstrage we used to get the details we stored as medicine
+  sheet: "medlabel:sheetItems",   
 };
 
-/*     id
-medicineName
-strength  - 650mg
-dosageForm   -tablet/syrub 
-price
-stock
-barcodeId
-barcodeImageUrl
-expiryDate
-createdAt
-updatedAt
- */
+
 
 
 const Add = () => {
@@ -88,15 +77,7 @@ const Add = () => {
 
     const [items,setItems]=useState<medicineDetails[]>([])
 
-    /* const items=[
-        {id:"123",name:"Paracetomol",dose:"650",expiry:"22/2/2029",batch:"PTK-112"},
-        {id:"433",name:"dolo",dose:"500",expiry:"22/2/2026",batch:"PTK-112"},
-        {id:"763",name:"cetrizine",dose:"750",expiry:"22/2/2039",batch:"PTK-112"},
-        {id:"986",name:"amolixin",dose:"350",expiry:"22/2/2027",batch:"PTK-112"},
-        {id:"432",name:"vanehud",dose:"250",expiry:"22/2/2026",batch:"PTK-112"},
-        {id:"943",name:"jpisnikm",dose:"650",expiry:"22/2/2027",batch:"PTK-112"},
-        {id:"653",name:"ghdysbj",dose:"640",expiry:"22/2/2028",batch:"PTK-112"}
-    ] */
+
 
     const [activeTab, setActiveTab] = useState("add");
     const[search,setSearch]=useState("")
@@ -105,20 +86,7 @@ const Add = () => {
 
 
 
-
-    /* const updateMedicine=(field:keyof PharmMedicine,value:string )=>{
-        setMedicine((prev)=>({
-            ...prev,
-            [field]:value
-            
-        }))
-
-        
-
-
-    } */
-
-    const updateMedicine = <K extends keyof PharmMedicine>(       /// it make as per the value eg:if string then string ,if number then numebr,eg: price:number,strength:string..both came so we use this
+    const updateMedicine = <K extends keyof PharmMedicine>(      
             field: K,
             value: PharmMedicine[K]
             ) => {
@@ -172,23 +140,22 @@ const Add = () => {
 
 
     const filteredItem=items.filter((iem)=>
-        //iem.name.toLowerCase().includes(search.toLowerCase())     -->it filter even the letter is in between, eg: ace type means it shows paracetomol
         iem.name.toLowerCase().startsWith(search.toLowerCase())
     )
 
     const toggle=(id:string)=>{
 
-       setSelectbox((prev)=>{  ///we are inside the usestate
+       setSelectbox((prev)=>{  
 
-            const next=new Set(prev)    //We are creating a copy of the existing Set..."Take everything currently inside prev and make a new Set containing those same values."
+            const next=new Set(prev)     
 
-            if (next.has(id)) {     //check if it ticked,if true then when onclick chnage to uncheck
+            if (next.has(id)) {     
                 next.delete(id);
             } else {
-                next.add(id);       //add tick
-                //console.log(next)
+                next.add(id);       
+                
             }
-            return next;   ////  update the usestate Set
+            return next;   
        })
 
 

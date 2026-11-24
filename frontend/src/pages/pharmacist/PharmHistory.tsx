@@ -23,7 +23,6 @@ const PharmHistory = () => {
       try{
 
         const resp=await api.get('/api/pharm/billdetails')
-        console.log(resp)
         setBill(resp.data.result.allbill)
 
       }catch(err){

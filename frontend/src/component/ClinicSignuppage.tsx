@@ -55,7 +55,7 @@ const ClinicSignuppage = () => {
       setLogo(file)
   }
 
-  useEffect(()=>{  /// used for viewing the image after uplaoding
+  useEffect(()=>{  
       if (!logo) {
         setPreview("");
         return;
@@ -73,7 +73,7 @@ const ClinicSignuppage = () => {
   }
 
   const handleSubmit=async()=>{
-    //e.preventDefault();
+  
     console.log(form)
     console.log(logo)
 
@@ -89,14 +89,12 @@ const ClinicSignuppage = () => {
       const formData=new FormData();
 
       Object.entries(form).forEach(  ([Key,value]) => {
-            formData.append(Key,value)     /// 1
+            formData.append(Key,value)     
       });
 
-      formData.append("logo",logo)        ///2
+      formData.append("logo",logo)        
 
-      //const resp=await api.post('/api/clinic/register',formData)
-
-      await registerClinic(formData)  /////🚨🚨🚨 Moving to context to signup
+      await registerClinic(formData)  
 
 
 

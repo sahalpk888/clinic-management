@@ -13,11 +13,9 @@ export const pharm_add=async(req:Request,res:Response)=>{
         const{medicine}=req.body;
         const user=req.user!.clinicId
 
-        //console.log(medicine)
-
-        //1     ==> check the details is correct,it gives back success and data:{medicine{...}}
+       
         const result = medicineValidator.safeParse(medicine);
-        //console.log(result)
+
 
         if (!result.success) {    /// condition-1
                 console.log(
@@ -33,13 +31,7 @@ export const pharm_add=async(req:Request,res:Response)=>{
         }
         
         
-        /* if(!result.success){  ///condition-1
-            return res.json({
-                success:false,
-                message:"Something wrong in pharm_add validator",
-                error:result.error
-            })
-        } */
+
 
 
         //2   if condition-1 fails after that below nothing works including step-2

@@ -15,21 +15,6 @@ interface Detail{
 const PharmSidebar = () => {
 
 
-
-
-/*     id
-medicineName
-strength  - 650mg
-dosageForm   -tablet/syrub 
-price
-stock
-barcodeId
-barcodeImageUrl
-expiryDate
-createdAt
-updatedAt
- */
-
   const item:Detail[]=[
         {name:"Prescription",path:"/pharmacist/view"},
         {name:"Inventory",path:"/pharmacist/cart"},

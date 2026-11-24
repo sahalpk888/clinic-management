@@ -47,9 +47,18 @@ const Bill = () => {
     upi:0
   })
 
+  const[clinicData,setClinicData]=useState({
+    name:"",
+    licenseno:"",
+    address:"",
+    phone:"",
+    gstno:""
+  })
+
   const[selectedmethod,setSelectedMethod]=useState<"cash" | "upi">("cash")
 
   const[showDisplay,setShowDisplay]=useState(false)
+
 
   useEffect(()=>{
 
@@ -62,6 +71,13 @@ const Bill = () => {
         setPatient(res.data.data.patientDetails)
         setPharmacy(res.data.data.medicinesData)
         setBill(res.data.data.billTotal)
+        setClinicData({
+          name:res.data.data.clinic_details.clinicaname,
+          licenseno:res.data.data.clinic_details.pharmLicense,
+          address:res.data.data.clinic_details.address,
+          phone:res.data.data.clinic_details.phone,
+          gstno:res.data.data.clinic_details.gst
+        })
 
       }catch(err){
         console.log(err)
@@ -105,10 +121,7 @@ const Bill = () => {
     upi:selectedmethod === "upi" ? enteredAmount: total - enteredAmount,
   });
   
-/*     setPaymentMethod({
-      cash:selectedmethod === "cash" ? patientamount : bill ? bill.amount - patientamount : 0,
-      upi:selectedmethod === "upi" ? patientamount : bill ? bill.amount - patientamount : 0
-    }) */
+
     setShowDisplay(true)
 
 
@@ -183,14 +196,14 @@ const Bill = () => {
          
                 <div   className='relative flex justify-between  p-5 bg-green-600 rounded-t-xl print:rounded-none '>
                     <div className='text-white  font-semibold'>
-                      <p className='text-3xl'>Mediflow</p>
-                      <p className='text-sm text-slate-700'>DL No. KL-20-RX-0417</p>
+                      <p className='text-3xl'>{clinicData?.name.toUpperCase()}</p>
+                      <p className='text-sm text-slate-700'>{clinicData?.licenseno.toUpperCase()}</p>
 
                     </div>
                     <div className='text-slate-700 text-sm '>
-                      <p>MG Road, Kochi, Kerala</p>
-                      <p>ph:0490-23370</p>
-                      <p>GSTIN: 32ABCDE1234F1Z5</p>
+                      <p>{clinicData?.address.toUpperCase()}</p>
+                      <p>ph :{clinicData?.phone}</p>
+                      <p>GSTIN:{clinicData?.gstno.toUpperCase()}</p>
 
                     </div>
                 </div>

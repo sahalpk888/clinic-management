@@ -19,9 +19,8 @@ export const register_patient=async(req:Request,res:Response)=>{
    
    
 
-    //  step:1 validator
-/*     const result =registerValidatePatient.safeParse(req.body); */
-    const result =registerValidatePatient.safeParse(patient);             //// the output (zod provides) ===> sucess:true,data:patient{...}
+
+    const result =registerValidatePatient.safeParse(patient);             
 
     if(!result.success){
       console.log("ZOD ERROR:");
@@ -33,28 +32,7 @@ export const register_patient=async(req:Request,res:Response)=>{
       })
     }
 
-    
 
-
-   /* 
-        after step-1
-     If validation succeeds ...it has 
-                  {
-                    success: true,
-                    data: {
-                      patient: {
-                        name: "Rahul",
-                        age: 25,
-                        gender: "Male",
-                        phone: "9876543210"
-                      }
-                    }
-                 }
-
-
-                 so in step-2 result.data comes
-   
-   */
 
 
    // step-2 service                         
@@ -104,7 +82,7 @@ export const reception_search=async(req:Request,res:Response)=>{
     }
 
 
-    const patientDetails=await exisitingPatientService(parsed.data.q,user)   /* here data.q beacuse parsed comes after validation..so zod give data inside data like:{sucess:true,data:{....}} */
+    const patientDetails=await exisitingPatientService(parsed.data.q,user)   
 
     res.status(200).json({
       success:true,
@@ -226,7 +204,7 @@ export const reception_patientHitory=async(req:Request,res:Response)=>{
 
 
 
-///this will check the already booked times and give back to frotnened so frontned removes that times
+
 
 export const reception_checkAppoint=async(req:Request,res:Response)=>{
 

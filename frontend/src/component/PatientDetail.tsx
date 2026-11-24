@@ -55,10 +55,6 @@ const PatientDetail = () => {
 
   const {patientId}=useParams()
 
-  //const patientId="f57031f6-5008-46d0-9d98-e9c7365ac43c"
- // const patientId="7e8b8f47-a451-43ce-a755-0d2cbf2b6703"
-  
-
   useEffect(()=>{
 
     const hello=async()=>{
@@ -124,7 +120,7 @@ const PatientDetail = () => {
         </div>
       </Card>
 
-       {/* Visit Header */}
+  
       {
         patient?.visits.map((pro)=>(
           <Card className='min-h-50 mt-10  '>

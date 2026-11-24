@@ -4,7 +4,6 @@ import cloudinary from "../configs/cloudinary.js";
 
 
 
-/* it is resuable component for cloudinary, can be used for every proeject ...it need to recive the req.file and folder-name  */
 
 
 interface UploadResult {
@@ -29,7 +28,7 @@ export const uploadImage = (file: Express.Multer.File,folder: string): Promise<U
       }
     );
 
-    uploadStream.end(file.buffer);       ///file.buffer because in muter we use memorystorage
+    uploadStream.end(file.buffer);       
   });
 };
 

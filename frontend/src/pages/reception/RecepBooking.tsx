@@ -23,8 +23,8 @@ const RecepBooking = () => {
 
 
     const[search,setSearch]=useState("");
-    const[oldPatient,setOldPatient]=useState<ExisitingPatient[] >([])    ///old patient save..===> console.log(oldPatient)
-    const[selectPatient,setSelectPatient]=useState<ExisitingPatient | null>(null)  ///single patient agter clicking form exisiting patient
+    const[oldPatient,setOldPatient]=useState<ExisitingPatient[] >([])    
+    const[selectPatient,setSelectPatient]=useState<ExisitingPatient | null>(null)  
     const [bookingDate,setBookingDate]=useState("")
   
      
@@ -33,7 +33,7 @@ const RecepBooking = () => {
   
 
 
-      const [patient,setPatient]=useState<PatientDetails>({     ///new patient save...==> console.log(patient)
+      const [patient,setPatient]=useState<PatientDetails>({    
     
            name:"",
             age:"",
@@ -75,7 +75,7 @@ const RecepBooking = () => {
                 const resp=await api.post('/api/recep/bookingregister',{
                                                                          patientId:selectPatient.id,
                                                                          bookingDate
-                                                                        });      /* 🚨🚨 sending patientId for old patients */
+                                                                        });      
                 console.log("Backend response:", resp.data);
 
                 setSelectPatient(null);
@@ -88,7 +88,7 @@ const RecepBooking = () => {
                     const resp=await api.post('/api/recep/bookingregister',{
                                                                              patient,
                                                                              bookingDate
-                                                                           });   /* 🚨🚨 sending patient && date */
+                                                                           });   
                     console.log("Backend response:", resp.data);
 
                     setPatient({

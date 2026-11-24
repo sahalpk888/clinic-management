@@ -3,8 +3,6 @@ import { Role } from "../types/roles.js"
 
 
 
-  /// allowedroles means in route we tell ===> authorize("admin", "doctor") ........ this admin ,doctor only the allowedroles here ,if authorize("admin") means only admin
-
 export const authorize=(...allowedroles:Role[])=>{return(req:Request,res:Response,next:NextFunction)=>{
 
                 // Check authentication

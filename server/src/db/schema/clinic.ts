@@ -10,7 +10,7 @@ export const clinic=pgTable("clinic",{
     phone:varchar("phone").notNull(),
     address:text("address").notNull(),
     logoUrl:text("logo_url").notNull(),
-    logoPublicId: text("logo_public_id"), ///needed when deletein image form cloudinary
+    logoPublicId: text("logo_public_id"), 
     gstin:text("gstin").notNull(),
     pharmacyLicense:varchar("pharmacy_license"),
     clinicLicense:varchar("clinic_license"),

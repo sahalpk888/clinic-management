@@ -14,8 +14,8 @@ const RecepToken = () => {
 
     const[tab,setTab]=useState("add");
     const[search,setSearch]=useState("");
-    const[selectPatient,setSelectPatient]=useState<ExisitingPatient | null>(null) ////existintg one single selected patient
-    const [Expatient, setExPatient] = useState<ExisitingPatient[]>([]); /// existing of all patient in that name
+    const[selectPatient,setSelectPatient]=useState<ExisitingPatient | null>(null) 
+    const [Expatient, setExPatient] = useState<ExisitingPatient[]>([]); 
     const[token,setToken]=useState("")
     const [showPatients, setShowPatients] = useState(true);
    
@@ -42,7 +42,7 @@ const RecepToken = () => {
 
         const queryOK =search.trim();
 
-        // Don't search if the query is empty or a patient is selected
+        
         if (queryOK.length < 2 || selectPatient !== null) {
             setExPatient([]);
             return;
@@ -91,7 +91,7 @@ const RecepToken = () => {
 
 
 
-            /* one for all  */                 ///the nextref point to an <input/>  ....nextref may be ageinputref,weightinputref etc any according to what is given in onkeydown()
+          
     const handleEnter=(e:React.KeyboardEvent, nextRef: React.RefObject<HTMLInputElement | null> )=>{
         if (e.key === "Enter"){
             nextRef.current?.focus()
@@ -155,7 +155,7 @@ const RecepToken = () => {
 
 
     
-    /* const [existingPatients, setExistingPatients] = useState<PatientDetails[]>([ {...} , {...}   })   --->this is used for editing.like here change age of rahul to 25 to 35 we need to use this...*/
+    
 
      
 

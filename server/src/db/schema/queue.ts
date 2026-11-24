@@ -15,11 +15,3 @@ export const queue=pgTable("queue",{
 
 
 
-/* 
-date is the primary key. This means you can have only one queue record for a particular date across your entire application.
-
-Instead, each clinic needs its own queue for each date.
-
-Use a composite primary key consisting of clinicId and date.
-
-*/

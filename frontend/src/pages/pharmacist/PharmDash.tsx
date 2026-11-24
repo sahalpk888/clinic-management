@@ -30,8 +30,8 @@ const PharmDash = () => {
     bill:0,
     medicine:0,
   })
-  const [topmedicine,setTopMedicine]=useState<MedcineTOP[]>([])    ///for chart-1  
-  const[report,setReport]=useState<MonthlyReportRow[]>([])   /// for chart-2
+  const [topmedicine,setTopMedicine]=useState<MedcineTOP[]>([])    
+  const[report,setReport]=useState<MonthlyReportRow[]>([])   
 
   
 
@@ -47,10 +47,10 @@ const PharmDash = () => {
   }
 
 
-  const CustomTooltip=({active,payload,label}:any)=>{  //here active,payload ,label is part of the barchart...active = which ba is hovered.payload=[...sortedMedicine],label=sortedmedicine.key
+  const CustomTooltip=({active,payload,label}:any)=>{  
     if (!active || !payload.length) return null;
 
-    return(                                      ///must include return else not work
+    return(                                      
        <div className='bg-white border border-gray-200 rounded-lg shadow-md px-3 py-2 text-sm'>
           <p>{label}</p>
           {
@@ -74,11 +74,7 @@ const PharmDash = () => {
         const resp=await api.get('/api/pharm/dash');           //1st api
         const response=await api.get('/api/pharm/dashweek' );   //2nd api)
       /* --------------------------------------------------------------------------------- */
-        /* setDashDetails(prev=>({
-          ...prev,
-          bill:resp.data.result.bill.count
-        }))
-         */
+
         setDashDetails({
           bill:resp.data.result.bill.count,
           medicine:resp.data.result.medicinecount.medicinecount
@@ -100,8 +96,8 @@ const PharmDash = () => {
 
 
 
-      const metricLabel: Record<typeof metric, string> = {      /*  metrics is usestate....const[metric,setMetrics]=usestate()...here typeof metric means key,,value=string..so key should be same as metric usestate and value may be string */
-        bills: 'Total Bills',   ///bills is part of usetstate "metrics" so it becaome "type of metric" if we give anyother it shos error because it si not in usetstae,and value is string..so 
+      const metricLabel: Record<typeof metric, string> = {      
+        bills: 'Total Bills',    
         revenue: 'Revenue (₹)',
       }
 
@@ -135,7 +131,7 @@ const PharmDash = () => {
 
           <ResponsiveContainer width="100%" height={320}>
              <BarChart data={filter} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />   ///  lines like this ----------------
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />   
               <XAxis dataKey='medicinename'  tick={{ fontSize: 12 }} interval={0} angle={-15} textAnchor="end" height={60} />
               <YAxis tick={{fontSize:12}} />
               <Tooltip content={<CustomTooltip/>} />  {/* when hover the value can been seen */}

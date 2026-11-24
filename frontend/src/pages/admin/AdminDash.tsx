@@ -98,7 +98,7 @@ const AdminDash = () => {
             try{
                 const resp=await api.get('/api/clinic/admindash');
 
-                console.log(resp);
+   
                 setRevenueData(resp.data.result.weekly_revenue)
                 setSummaryData({
                   appointmentcount:resp.data.result.appointmentcount.appoitcount,

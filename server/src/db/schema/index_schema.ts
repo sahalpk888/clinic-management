@@ -17,14 +17,14 @@ import { employeeDetails } from "./employeeDetails.js";
 import { patientRelation,visitRelation,consultRelation,prescriptionRelation,medicineRelation } from "./relations.js";
 
 
-export {                  /* becasue in drizzle.config.ts we calling only index_schema.ts so other all schema need to be export  */
+export {                  
 
     patient,
     visit,
     queue,
     pharmMedicine,
-    strengthUnitEnum,  /* must include for enum */
-   dosageFormEnum,     /* must to inclcude for enu */
+    strengthUnitEnum,  
+   dosageFormEnum,     
     consultationSchema,
     prescriptionSchema,
     pharmacyBill,

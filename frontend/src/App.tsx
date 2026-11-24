@@ -6,7 +6,6 @@ import { Route,Routes } from 'react-router-dom'
 import Sidebar from "./pages/doctor/DoctorSidebar"
 import Dashboard from "./pages/doctor/Dashboard"
 import Inventory from "./pages/doctor/Appointment"
-import Test from "./component/Test"
 import Consult from "./component/Consult"
 import Doctor from "./pages/doctor/Doctor"
 import { useState } from "react"
@@ -15,7 +14,6 @@ import PharmSidebar from "./pages/pharmacist/PharmSidebar"
 import PharmDash from "./pages/pharmacist/PharmDash"
 import Bill from "./pages/pharmacist/Bill"
 import Add from "./pages/pharmacist/Add"
-import MedicineLabelApp from "./component/Test2"
 import type { Alldetails } from "./types/types"
 import PharmInventory from "./pages/pharmacist/PharmInventory"
 import PharmHistory from "./pages/pharmacist/PharmHistory"
@@ -35,14 +33,13 @@ import AdminPharm from "./pages/admin/AdminPharm"
 import AdminAdd from "./pages/admin/AdminAdd"
 import AdminStaff from "./pages/admin/AdminStaff"
 import MedicinePage from "./component/MedicinePage"
-import ClinicSignup from "./component/Test2"
 import ClinicSignuppage from "./component/ClinicSignuppage"
 import Login from "./component/loginPage"
 import Unauthorized from "./component/Unauthorized"
 import ProtectedRoute from "./component/ProtectedRoute"
 import PageNotFound from "./component/PageNotFound"
 import AdminStaffDetails from "./component/AdminStaffDetails"
-import Test2 from "./component/Test2"
+
 import PatientDetail from "./component/PatientDetail"
 
 
@@ -50,7 +47,6 @@ import PatientDetail from "./component/PatientDetail"
 
 function App() {
 
-  //const { token } = useAppContext();
 
   const{setAllDetails}=useAppContext()
 
@@ -66,18 +62,13 @@ function App() {
   return (
     <>
      <Routes>
-             {/*  <Route path='/' element={<LandingPage/>}  /> */}
-              <Route path='/' element={<Home/>}  />
-              <Route path='/test' element={<Test/>}  />
-              <Route path='/test2' element={<Test2/>}  />
-         
-              {/* <Route path='/dr' element={<Doctor onNext={(data)=>console.log(data)}  doctorName="Sahal" clinicName="MIMS"  />}  />  */} ///method-2
+           
+              <Route path='/' element={<Home/>}  />                  
               <Route path='/medicine' element={<MedicinePage/>} />
               <Route path='/signup' element={<ClinicSignuppage/>} />
               <Route path='/login' element={<Login />} />
               <Route path="unauthorised" element={<Unauthorized/>}  />
-
-              <Route path="*" element={<PageNotFound />} /> /// if we search any url which is not there it goes here.eg: /doctor/report..
+              <Route path="*" element={<PageNotFound />} /> 
          
 
 
@@ -92,7 +83,7 @@ function App() {
                                      <Route path='consult' element={<Consult/>}  />
                                 </Route>
                                
-                                <Route path='/doctorpage' element={<Doctor onNext={handleDoctorNext}  doctorName="Sahal" clinicName="MIMS"  />}  />    {/* onNext func gets the value from doctor page */}
+                                <Route path='/doctorpage' element={<Doctor/>}  />    
                 </Route>
       
              {/* --------------------------------------------------------------------- */}

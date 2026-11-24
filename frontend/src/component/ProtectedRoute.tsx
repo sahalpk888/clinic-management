@@ -23,12 +23,12 @@ const ProtectedRoute=({allowedroles}:ProtectedRouteProps)=>{
         }
 
 
-        // User is not logged in ... 1st authenticate (check authenticated or not)
+       
         if(!owner){
             return(
-                <Navigate to="/login" replace state={{from:location}} />     ////here what wwe doing is we are passwing location
-            )                                                                  ///eg: user click locallhost/staff..here location ==> /staff
-        }                                                                       //so if no logged in we navigate to login page.in that we call the location so they get location="/staff"...we redirect to that page..its simple like redirecing to where page we were before login
+                <Navigate to="/login" replace state={{from:location}} />     
+            )                                                                 
+        }                                                                       
 
 
         //2nd authenticate (check whether they role have access)
@@ -40,8 +40,7 @@ const ProtectedRoute=({allowedroles}:ProtectedRouteProps)=>{
 
 
 
-         // Allow access....if authenticate and role have access then :-
-
+        
          return <Outlet />;
 
 

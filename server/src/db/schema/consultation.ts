@@ -9,7 +9,7 @@ import { visit } from "./visit.js";
 export const consultationSchema=pgTable("consultation",{
     id:uuid("id").defaultRandom().primaryKey(),
     patientId:uuid("patient_id").notNull().references(()=>patient.id,{onDelete:"cascade"}),
-    visitId: uuid("visit_id"), ///we adding this becasue we need to see which consultation refered on specific visit.
+    visitId: uuid("visit_id"), 
     clinicId:uuid("clinic_id").notNull().references(()=>clinic.id),
     diagnosis:text("diagnosis").notNull(),
     createdAt:timestamp("created_at").defaultNow().notNull()

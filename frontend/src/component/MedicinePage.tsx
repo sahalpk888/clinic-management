@@ -61,7 +61,7 @@ const MedicinePage = () => {
 
 
   const money = (amount: number) =>    
-    new Intl.NumberFormat("en-IN", {     /* it makes convert to  1500 ===> ₹1,500rs */
+    new Intl.NumberFormat("en-IN", {    
       style: "currency",
       currency: "INR",
       maximumFractionDigits: 2,
@@ -287,7 +287,7 @@ const MedicinePage = () => {
 
        
 
-        {/* Delete confirmation */}
+      
         {showDelete && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
             <div

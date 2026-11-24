@@ -9,7 +9,7 @@ import type { Patient } from "../types/types";
 
 const Consult = () => {
 
-    const {consultDetails,navigate}=useAppContext();
+    const {navigate}=useAppContext();
 
      
       const location=useLocation()
@@ -20,36 +20,6 @@ const Consult = () => {
       
    
     const [patient,setPatient]=useState<Patient[]>([]);
-    
-
-     const items=[
-        {name:"fever",amount:44},
-        {name:"cold",amount:34},
-        {name:"dengue",amount:2},
-        {name:"cough",amount:16},
-        {name:"headache",amount:11},
-      ]
-
-     const medicine=[
-        {samsung:"paracetomol",amount:4},
-        {samsung:"dolo",amount:3},
-        {samsung:"cetrizene",amount:2},
-        {samsung:"amoliixin",amount:6},
-        {samsung:"coldflue",amount:1},
-      ]
-
-
-    const sortedOrder=useMemo(
-        ()=>[...items].sort((a,b)=>b.amount-a.amount),
-        []
-      )
-
-      const sortedMedicine=useMemo(
-        ()=>[...medicine].sort((a,b)=>b.amount-a.amount),
-        []
-      )
-
-      
 
 
       useEffect(()=>{
@@ -133,25 +103,7 @@ const Consult = () => {
                                             </thead>
                                           </table>
                                         </div>  
-                        </div>
-
-
-
-
-
-
-
-             
-                      
-             
-
-
-
-            
-
-             
-
-           
+                        </div>                
         
 
     </div>

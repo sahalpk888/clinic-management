@@ -23,7 +23,7 @@ const RecepAppoint = () => {
   const [bookedTimes,setBookedTimes]=useState<string[]>([]);
 
   const[list,setList]=useState<ExisitingPatient[]>([])
- // const[singlePerson,setSinglePerson]=useState<bookingPatient | null>(null)
+
  const[singlePerson,setSinglePerson]=useState({
   name:"",
   age:"",
@@ -34,26 +34,6 @@ const RecepAppoint = () => {
 
   const [search,setSearch]=useState("")
   
-
-  /* const formattedDay = selectedDay                         ////method-1
-     ? (() => {
-        const date = new Date(selectedDay + "T00:00:00");
-
-        const weekday = date.toLocaleDateString("en-IN", {
-          weekday: "long",
-        });
-
-        const month = date.toLocaleDateString("en-IN", {
-          month: "long",
-        });
-
-        const day = date.toLocaleDateString("en-IN", {
-          day: "numeric",
-        });
-
-        return `${weekday} - ${month}-${day}`;
-      })()
-  : "no value"; */
 
 
   const formatted=(selectedDay:string)=>{
@@ -167,7 +147,7 @@ const timeSlots = [
                                   }
          })
 
-        console.log(res);      ////  {  "bookedTimes": ["09:00", "10:30", "14:00"]  }
+        console.log(res);     
         setBookedTimes(res.data.bookedTimes ?? [])
         
 

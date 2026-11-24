@@ -14,25 +14,20 @@ import { consultationSchema } from "../db/schema/consultation.js";
 
 
 
-/// registerValidInput is a interface created in validator
 
 export const registerPatientService=async(data:registerValidInput,clinicIddata:string)=>{
 
-   //// 2026-10-08T06:56:12.128Z  ------->  2026-10-08
-    const today=new Date().toISOString().split("T")[0];
 
-   /// transaction means it stores only if everything is sucess if 1,2,3 any fail all fils because we dont need incomplete data.
+    const today=new Date().toISOString().split("T")[0];
 
     return await db.transaction(async (tx)=>{
 
 
-                /// 1.create patient    
-                    ///here [patientData]...why [] becasue 🚨🚨🚨 after returning() 🚨🚨🚨 it gives as array the result so we need just the value ..eg we need {name:"rahul"}  not ike [{name:rahul}]
+              
                 const [patientData]= await tx
                                             .insert(patient)
-                                            .values({
-                                                /* name:data.patient.name,    if in forntned it send liek {patient{name"rahul"}}  then use like this else like below*//* here data.patient becasue in frotnened we send {patient} so it comes as {patient:{....}}...so add data.patient */
-                                                name:data.name,  /* here the frontend sends like {name:"rahul"} so just data.name */
+                                            .values({                          
+                                                name:data.name,  
                                                 gender:data.gender,
                                                 age:String(data.age),
                                                 clinicId:clinicIddata,
@@ -48,7 +43,7 @@ export const registerPatientService=async(data:registerValidInput,clinicIddata:s
                 ///  2. token
 
                 const [counterData]=await tx 
-                                    .insert(queue)             /* It means: if a row for this date already exists, update it instead of inserting a duplicate. */
+                                    .insert(queue)             
                                     .values({date:today,lastToken:1,clinicId:clinicIddata}).onConflictDoUpdate({target:[queue.clinicId, queue.date],
                                                                                               set:{
                                                                                                 lastToken:sql`${queue.lastToken}+1`
@@ -182,13 +177,6 @@ export const existingBooking=async(patientId:string,bookingDate:string,clinicIdD
 
  return await db.transaction(async (ex)=>{
 
-    /*  ///1 
-
-      const [exisitingPatient]= await ex 
-                                      .select()
-                                      .from(patient)
-                                      .where(eq(patient.id,patientId))
-     */
 
 
       //1
@@ -271,11 +259,11 @@ export const reception_HistoryofPatient=async({page,search}:getPatient,clinicIdD
 
   const offset=(page-1)*limit
 
-  const searchCondition=search ?   /// works if search have value
+  const searchCondition=search ?   
                           or(
-                              ilike(patient.name,`${search}%`),      ///here % means show any which contiasn that eg:sah means it shows sahal,sahal pk...We put % at the beginning, end, or both ends depending on what we want to search.
+                              ilike(patient.name,`${search}%`),     
                               ilike(patient.phone,`${search}%`)                                  
-                             ):undefined; ///undefin when no search so it display all the patient..below where become undefined so all patient comes if search is value like "sahal" then const data gives that patient only else full patient
+                             ):undefined;
  
   const data=await db
                    .select()
@@ -285,12 +273,12 @@ export const reception_HistoryofPatient=async({page,search}:getPatient,clinicIdD
                       searchCondition,
                       eq(patient.clinicId,clinicIdData)
                     )
-                   )  ///here if we search according to that name it gives else search empty means where will undefine and all patient details comes
+                   )  
                    .limit(limit)
                    .offset(offset);
 
 
-  // Count every matching patient, not just the current page.
+ 
   const [countResult] = await db
                               .select({ total: count() })
                               .from(patient)
@@ -350,7 +338,7 @@ export const old_booking=async(patientId:string,timeAppoint:string,selectedDay:s
                                           .insert(queue)
                                           .values({date:selectedDay,lastToken:1,clinicId:clinicIdData})
                                                                                                       .onConflictDoUpdate({
-                                                                                                        target:[queue.clinicId,queue.date],   /*it means this particular clinic id that particulat date make lasttoken increment 1....  Suppose today's date doesn't exist in the queue table.  then add token=1 else increment */
+                                                                                                        target:[queue.clinicId,queue.date],  
                                                                                                         set:{lastToken:sql`${queue.lastToken}+1`}                                     
                                                                                                         }).returning()
                 const [booking]=await tx
@@ -404,7 +392,7 @@ export const new_booking=async(singlePerson:newBooking,timeAppoint:string,select
         //2
          const [counter_booking]=await pop 
                             .insert(queue)
-                            .values({date:selectedDay,lastToken:1,clinicId:clinicIdData}).onConflictDoUpdate({target:[queue.clinicId,queue.date],   /*  Suppose today's date doesn't exist in the queue table.  then add token=1 else increment */
+                            .values({date:selectedDay,lastToken:1,clinicId:clinicIdData}).onConflictDoUpdate({target:[queue.clinicId,queue.date],  
                                                                                               set:{
                                                                                                 lastToken:sql`${queue.lastToken}+1`
                                                                                               }                                         
@@ -437,7 +425,7 @@ export const receptionist_dashService=async(clinicIdData:string)=>{
       const formatteddate=formatDate(today,"yyyy-MM-dd");
   
   
-      const monday=startOfWeek(today,{ ///to get monday,,regardkless what today is if today=tuesday nov-12 then monday=nov-11..it gives the week monday date
+      const monday=startOfWeek(today,{ 
         weekStartsOn:1
       })
   
@@ -468,7 +456,7 @@ export const receptionist_dashService=async(clinicIdData:string)=>{
                                         isNotNull(visit.appoitTime)
                                       )
                                     )
-        const [completecount] = await db  /// it gievs the count of whcih completed the pharamcybill who is in appointment.
+        const [completecount] = await db  
                                  .select({complete:count()})
                                  .from(pharmacyBill)
                                  .innerJoin(consultationSchema,eq(consultationSchema.id,pharmacyBill.consultId))

@@ -25,34 +25,9 @@ export const registerClinic=async(req:Request,res:Response)=>{
             })
         }
 
-         const image=await uploadImage(logo,"clinic-managemnt/clinic")  ///it used uploadimage of cloudinaryService to upload it and give back secure_url.
+         const image=await uploadImage(logo,"clinic-managemnt/clinic") 
           
          const result=await clinic_registerService({...req.body , logoUrl:image.secure_url,logoPublicId:image.public_id})
-
-         console.log(result);
-
-         /* --------------- cookie method ---------------- */
-
-         /* const tokenValue=jwt.sign(
-            {
-              clinicId:result.registerClinic.id,
-              role:result.owner.role  
-            },
-            process.env.JWT_SECRET!,
-            {
-                subject:result.owner.id,
-                expiresIn:'7d'
-            }
-        );
-
-          res.cookie("token", tokenValue, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            path: "/",
-            }); */
-
 
 
         return res.status(201).json({
@@ -114,7 +89,7 @@ export const clinic_login=async(req:Request,res:Response)=>{
         res.cookie("token", tokenValue, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            sameSite: process.env.NODE_ENV === "production" ? "none":"lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: "/",
         });
@@ -164,7 +139,7 @@ export const clinic_logout=async(req:Request,res:Response)=>{
 
 export const register_staff=async(req:Request,res:Response)=>{
     try{
-         const clinicData=req.user;  ///we use this to get clinicid
+         const clinicData=req.user;  
 
          if(!clinicData){
             return res.json({
@@ -209,7 +184,6 @@ export const register_staff=async(req:Request,res:Response)=>{
  export const clinic_meController=async(req:Request,res:Response)=>{
     try{
 
-       // console.log(req.user);
 
         const userMe=req.user;
 

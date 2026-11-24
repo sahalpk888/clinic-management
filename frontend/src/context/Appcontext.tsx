@@ -15,12 +15,6 @@ interface ConsultDetail{
 }
 interface AppContextType {
 
-  //user: string | null;
-  //setUser: React.Dispatch<React.SetStateAction<string | null>>;
-
-  //token: string;
-  //setToken: React.Dispatch<React.SetStateAction<string>>;
-
   navigate: NavigateFunction;
 
 
@@ -32,16 +26,13 @@ interface AppContextType {
 
   api:typeof api;
 
-  /* medicineDetails: PharmMedicine[] | null;
- setMedicineDetails: React.Dispatch<React.SetStateAction<PharmMedicine[] | null>>; */
-
  medicineDetails: PharmMedicine | null;
  setMedicineDetails: React.Dispatch<React.SetStateAction<PharmMedicine | null>>;
 
  owner:Owner | null;
  setOwner:React.Dispatch<React.SetStateAction<Owner | null>>;
  authLoading: boolean;
- registerClinic:(data:FormData)=>Promise<void>;   ///here FormData is built-in JavaScript Web API class that it recieve as formdata
+ registerClinic:(data:FormData)=>Promise<void>;   
  logout: ()=>void
  registerStaff:(data:FormData)=>Promise<void>;
 
@@ -62,8 +53,7 @@ export const AppContextProvider = ({
 }) => {
 
 
-  //const [user, setUser] = useState<string | null>(null);
-  //const [token, setToken] = useState("hello sahal");
+  
   const[consultDetails,setConsultDetails]=useState<ConsultDetail>({
     content:"",
     date:null
@@ -80,7 +70,7 @@ export const AppContextProvider = ({
 /* ----------------------------------------------------------------------------------------- */
    
    
-  // Register clinic
+
    const registerClinic=async(data:FormData):Promise<void> =>{
           const resp=await api.post<AuthResponse>('/api/clinic/register',data)
           console.log(resp)
@@ -134,10 +124,7 @@ export const AppContextProvider = ({
   const navigate =useNavigate()
 
   const value = {
-    //user,
-    //setUser,
-    //token,
-    //setToken,
+
     navigate,
     consultDetails,
     setConsultDetails,

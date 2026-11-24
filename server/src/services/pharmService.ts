@@ -11,6 +11,7 @@ import { pharmacyPaymentMethod } from "../db/schema/pharmacyPayment.js";
 import { addDays, endOfWeek, formatDate, formatDistance, startOfWeek } from "date-fns";
 import { TZDate } from "@date-fns/tz";
 import { format } from "date-fns";
+import { clinic } from "../db/schema/clinic.js";
 
 
 
@@ -71,6 +72,20 @@ export const pharm_billService=async(clinicIdData:string)=>{
 
   
    return await db.transaction(async (tsx)=>{
+
+    //0
+
+     const [clinic_details]=await tsx 
+                                  .select({
+                                    clinicaname:clinic.clinicName,
+                                    pharmLicense:clinic.pharmacyLicense,
+                                    address:clinic.address,
+                                    phone:clinic.phone,
+                                    gst:clinic.gstin
+
+                                  })
+                                  .from(clinic)
+                                  .where(eq(clinic.id,clinicIdData))
     
 
      //1
@@ -113,17 +128,9 @@ export const pharm_billService=async(clinicIdData:string)=>{
                                       .where(and(
                                         eq(pharmacyBill.id, hello.id),
                                         
-                                      ));  ///here we are taking reference from pharmBill so inside it has consultId and id
-                                        /* 
-                                            if not "used where" ..it looks like below ⬇️⬇️⬇️⬇️⬇️
-                                              [
-                                                { billId: "B-7445", patient: "Barcelona" },
-                                                { billId: "B-7446", patient: "Rahul" },
-                                                { billId: "B-7447", patient: "Arun" }
-                                              ]
-                                        */
+                                      ));  
 
-            // 3. Get all medicines for this bill...this cotain all mesdicne eg:["paracetomol","dolo"]...its for array ..here not mention [] inside of medicineData
+            // 3. 
             const medicinesData = await tsx
                                         .select({
                                             medicineName: pharmMedicine.name,
@@ -146,29 +153,12 @@ export const pharm_billService=async(clinicIdData:string)=>{
                                               )
                                           );
 
-                                          /* here also if not used "where" it gives all...we need only eg:c1 mentioned medicines only 
-                                                    [❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
-                                                      { medicineName: "Paracetamol", qty: 15 },
-                                                      { medicineName: "Dolo", qty: 10 },
-                                                      { medicineName: "Cough syrup", qty: 2 },
-                                                      { medicineName: "Cetirizine", qty: 5 },
-                                                      { medicineName: "Vitamin tablets", qty: 10 }
-                                                       
-                                                    ]❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
+                                         
 
 
-
-                                                    [✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
-                                                      { medicineName: "Paracetamol", qty: 15 },
-                                                      { medicineName: "Dolo", qty: 10 }
-                                                    ]✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
-                                          
-                                          */
-
-
-           ///maping the mediciendata and caluclating the taxable amount,gstamount,totalamout for each (it calculate one medicine at a time and store as []...we then calculate total below)
+          
         const medicineRow=medicinesData.map((mop)=>{
-                const amount=mop.amount??0   ///we add this becasue in prescriptionSchema we not included notNull()..so it may be number or null and show error  if we not include without this..(we already caluclated amount before)
+                const amount=mop.amount??0   
                 const taxable_amount= Number((amount/(1+mop.tax/100)).toFixed(2))
                 const gst_amount=Number((amount - taxable_amount).toFixed(2))
 
@@ -180,7 +170,7 @@ export const pharm_billService=async(clinicIdData:string)=>{
         });
 
          
-          //////////caluclate the taxable amount,gst total,total maount using reduce ..allatoegther(medicien1+medicine2+...)
+
         const billTotal=medicineRow.reduce((total,med)=>({
               taxable_amount:Number((total.taxable_amount+med.taxable_amount).toFixed(2)),
               gst_amount:Number((total.gst_amount+med.gst_amount).toFixed(2)),
@@ -208,16 +198,12 @@ export const pharm_billService=async(clinicIdData:string)=>{
 
 
 
-       
-
-
-
-
         return{
           patientDetails,
           medicinesData,
           billTotal,
-          updatedBill
+          updatedBill,
+          clinic_details
           
         }
 
@@ -256,11 +242,11 @@ export const pharm_approveService=async(bill_id:string,paymentmethod:PaymentType
                     })
                     .returning()
 
-        const stock=await tx             //////// used to reduce the qty from inventory after selling
+        const stock=await tx             
                           .select({
                             stock:pharmMedicine.stock,
-                            totalunit:pharmMedicine.totalunit,   //// it means eg:10 (10 tablet ina slip,,, 1 stock=10tablet )
-                            qty:prescriptionSchema.qty,   ///qty prescribed ,which emasn total selling qty
+                            totalunit:pharmMedicine.totalunit,   
+                            qty:prescriptionSchema.qty,   
                             medicineId:pharmMedicine.id
                           })
                           .from(pharmacyBill)
@@ -276,10 +262,10 @@ export const pharm_approveService=async(bill_id:string,paymentmethod:PaymentType
             const stock_update=await Promise.all(
                 stock.map(async(pos)=>{
                      
-                  const stocker=Number((pos.stock)) * Number(pos.totalunit)   ///eg:stok=222 means 222*10=2220 units
-                  const reduceqty=pos.qty  ///we need to reduce qty to uodate the real stcok eg: 6(qty)
-                  const doms=stocker - reduceqty ///eg: 2220-6
-                  const final=doms/Number(pos.totalunit)   ///221.4/10 ===? 221.4 (convert back to stock)
+                  const stocker=Number((pos.stock)) * Number(pos.totalunit)   
+                  const reduceqty=pos.qty  
+                  const doms=stocker - reduceqty 
+                  const final=doms/Number(pos.totalunit) 
 
                   return await tx 
                                 .update(pharmMedicine)
@@ -303,12 +289,12 @@ export const pharm_approveService=async(bill_id:string,paymentmethod:PaymentType
 export const pharm_billdetailsService=async(clinicIdData:string)=>{
 
 
-      const today = new Date();          //Suppose today is 2026-10-31.
+      const today = new Date();          
 
-      const start = new Date(today);     //start = October 31, 00:00:00
+      const start = new Date(today);     
       start.setHours(0, 0, 0, 0);
 
-      const end = new Date(start);        //end = November 1, 00:00:00
+      const end = new Date(start);        
       end.setDate(end.getDate() + 1);
 
   const allbill=await db
@@ -325,8 +311,8 @@ export const pharm_billdetailsService=async(clinicIdData:string)=>{
                       .innerJoin(consultationSchema,eq(consultationSchema.id,pharmacyBill.consultId))
                       .innerJoin(patient,eq(patient.id,consultationSchema.patientId))
                       .where(and(
-                        gte(pharmacyBill.createat,start),      /// gte --->  Greater Than or Equal To (>=)
-                        lt(pharmacyBill.createat,end),          /// lt --->   Less Than 
+                        gte(pharmacyBill.createat,start),    
+                        lt(pharmacyBill.createat,end),          
                         eq(pharmacyBill.clinicId,clinicIdData)
                       ))
 
@@ -342,13 +328,13 @@ export const pharm_billdetailsService=async(clinicIdData:string)=>{
 
 export const pharm_dashService=async(clinicIdData:string)=>{
 
-     const today = new Date();          //Suppose today is 2026-10-31.
+     const today = new Date();         
      
 
-      const start = new Date(today);     //start = October 31, 00:00:00
+      const start = new Date(today);     
       start.setHours(0, 0, 0, 0);
 
-      const end = new Date(start);        //end = November 1, 00:00:00
+      const end = new Date(start);       
       end.setDate(end.getDate() + 1);
    
 
@@ -358,7 +344,7 @@ export const pharm_dashService=async(clinicIdData:string)=>{
                      })
                      .from(pharmacyBill)
                      .where(and(
-                        gte(pharmacyBill.createat,start),      /// gte --->  Greater Than or Equal To (>=)
+                        gte(pharmacyBill.createat,start),     
                         lt(pharmacyBill.createat,end),
                         eq(pharmacyBill.clinicId,clinicIdData)
 
@@ -371,7 +357,7 @@ export const pharm_dashService=async(clinicIdData:string)=>{
                                .from(consultationSchema)
                                .innerJoin(prescriptionSchema,eq(consultationSchema.id,prescriptionSchema.consultId))
                                .where(and(
-                                    gte(consultationSchema.createdAt,start),      /// gte --->  Greater Than or Equal To (>=)
+                                    gte(consultationSchema.createdAt,start),     
                                     lt(consultationSchema.createdAt,end),
                                     eq(consultationSchema.clinicId,clinicIdData)  
 
@@ -386,12 +372,12 @@ export const pharm_dashService=async(clinicIdData:string)=>{
                               .innerJoin(pharmMedicine,eq(pharmMedicine.id,prescriptionSchema.medicine))
                               .innerJoin(consultationSchema,eq(consultationSchema.id,prescriptionSchema.consultId))
                               .where(and(
-                                    gte(consultationSchema.createdAt,start),      /// gte --->  Greater Than or Equal To (>=)
+                                    gte(consultationSchema.createdAt,start),     
                                     lt(consultationSchema.createdAt,end),
                                      eq(prescriptionSchema.clinicId,clinicIdData)  
  
                               ))
-                              .groupBy(pharmMedicine.name)    //// 🚨🚨🚨🚨🚨 GROUP BY as putting records with the same value into the same group.....it makes differen group by this condition..so we get count of that group..
+                              .groupBy(pharmMedicine.name)   
 
 
 
@@ -408,35 +394,27 @@ export const pharm_dashService=async(clinicIdData:string)=>{
 
 export const pharm_DashWeeklyService=async(clinicIdData:string)=>{
      
-       /* startOfWeek,
-        endOfWeek,
-        startOfMonth,
-        endOfMonth,
-        format,
-        addDays,
-        subDays, */
-    ///  npm install date-fns @date-fns/tz      --->install this in backenednpm install date-fns-tz
 
 
     const TIMEZONE="Asia/Kolkata"
 
 
-   // 1. Get current date in Indian timezone
+   // 1.
     const today=TZDate.tz(TIMEZONE);
     
 
-     // 2. Get Monday of the current week...if today is wed nov-4 then it gives automatically using (startofWeek --data-fns )monday as nov-2
+     // 2. 
     const monday=startOfWeek(today,{
-      weekStartsOn:1  //1 means monday ,0 measn sunday
+      weekStartsOn:1  
     })
     
       
-    const endDate=addDays(monday,7)  ///here addDays measn to get the date after 7 days...eg: monday=nov-2 if addDay(monday,1) means nov-3 like wise addDay(7) menas next monday.reason to take last day as monday instead of sunday is that we using LT(less than) to use it like -- > gte(monday) and lt(monday)..measn this week monday to lessthan monday whih gives monday to sunday
+    const endDate=addDays(monday,7)  
     
     const result=await db
                       .select({
                         date:sql`TO_CHAR(       
-                        ${pharmacyBill.createat} AT TIME ZONE 'Asia/Kolkata','YYYY-MM-DD' )`,  ///TO_CHAR means convert 2026-11-02 14:35:20 ----> 2026-11-02 
+                        ${pharmacyBill.createat} AT TIME ZONE 'Asia/Kolkata','YYYY-MM-DD' )`,  
                         bills:count(),
                         revenue:sum(pharmacyBill.total_amount)
                         
@@ -459,8 +437,8 @@ export const pharm_DashWeeklyService=async(clinicIdData:string)=>{
 
                           
       const weekDateDetails=Array.from({length:6},(_,i)=>{
-                  const date=addDays(monday,i); ///here first is (monday,0) menas monday itself ..next (monday,1) menas tuesday likewise upto sunday
-                  const formatteddate=format(date,"yyyy-MM-dd"); ///it converts to 2026-10-02
+                  const date=addDays(monday,i); 
+                  const formatteddate=format(date,"yyyy-MM-dd"); 
                   const stats=result.find((itm)=>itm.date === formatteddate)
 
                   return {

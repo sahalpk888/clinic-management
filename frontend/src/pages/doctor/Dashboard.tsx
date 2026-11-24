@@ -78,20 +78,6 @@ const COLORS = [
   }
 
 
-  
-
-
-  const sortedOrder=useMemo(
-    ()=>[...items].sort((a,b)=>b.amount-a.amount),
-    []
-  )
-
-
-  const sortedWAYFORMEDICINE=useMemo(
-    ()=>[...topmedicine].sort((a,b)=>b.sold-a.sold),
-    []
-  )
-
   const shalu=({label,payload,active}:any)=>{
 
      if (!active || !payload.length) return null;
@@ -210,9 +196,8 @@ const COLORS = [
                                         ))}
                                       </Pie>
 
-                                      <Tooltip />    {/* Tooltip — shows details when you hover */}
-
-                                      <Legend   />  {/* Legend — explains what the colors/categories mean */}
+                                      <Tooltip />    
+                                      <Legend   />  
                                   
                                 </PieChart>
 
@@ -245,8 +230,8 @@ const COLORS = [
                                         
                                           ))}
                                         </Pie>
-                                        <Tooltip />    {/* Tooltip — shows details when you hover */}
-                                        <Legend  />  {/* Legend — explains what the colors/categories mean */}
+                                        <Tooltip />    
+                                        <Legend  />  
                                     
                                   </PieChart>             
                               </ResponsiveContainer>

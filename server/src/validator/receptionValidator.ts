@@ -33,18 +33,13 @@ export const registerValidatePatient=z.object({
 
   export const exisitingPatient=z.object({
 
-    q:z.string().trim().min(1).max(100),      /* here q mens..in frontned we send {q:queryOK}...so here q ....if frontend send{name:"hello"} then => hello:z.string() */
+    q:z.string().trim().min(1).max(100),     
 
 
   })
 
 
 
-
-
-
-
-///it is used for Zod generates the equivalent TypeScript type for you...You can then use it in your service: export async function registerPatient(data: RegisterPatientInput)
 
  export type registerValidInput=z.infer<typeof registerValidatePatient>;
 
