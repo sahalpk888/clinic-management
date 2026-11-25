@@ -175,7 +175,8 @@ npm run dev
 ## 📸 Screenshots
 
 ### Landing Page
-<img width="800" alt="Landing Page" src="https://github.com/user-attachments/assets/773d4180-ebaa-4b8d-b2d3-3dbeca8dc4f8" />
+<img width="800" alt="Landing Page" src="https://github.com/user-attachments/assets/38e91d57-fe04-4ca3-bf75-aff2a7813053" />
+
 
 ### Admin Dashboard
 <img width="800"  alt="Dashboard" src="https://github.com/user-attachments/assets/93b855cc-563b-4fdf-bcb1-bbbe5b771e01" />
@@ -191,15 +192,15 @@ npm run dev
 
 
 ### Patient History
-<img width="800" alt="Screenshot 2026-11-25 153927" src="https://github.com/user-attachments/assets/389a68a2-369e-460a-9bcf-9e313ba67f39" />
+<img width="800" alt="Patient History" src="https://github.com/user-attachments/assets/389a68a2-369e-460a-9bcf-9e313ba67f39" />
 
 
 ### Pharmacy: Add Medicine
-<img width="800" alt="Screenshot 2026-11-25 153938" src="https://github.com/user-attachments/assets/b457a966-7fc6-45d3-9438-1d17868f4aae" />
+<img width="800" alt="Add Medicine" src="https://github.com/user-attachments/assets/b457a966-7fc6-45d3-9438-1d17868f4aae" />
 
 
 ### Pharmacy: Billing
-<img width="800" alt="Screenshot 2026-11-25 154005" src="https://github.com/user-attachments/assets/27590755-0159-4bf2-9e48-79689fc8a425" />
+<img width="800" alt="Billing" src="https://github.com/user-attachments/assets/27590755-0159-4bf2-9e48-79689fc8a425" />
 
 
 <br>
