@@ -15,7 +15,7 @@ The system supports four roles, each with its own dashboard and permissions.
 ### 🧾 Receptionist
 - Register new patients and search existing ones
 - Book appointments and check availability
-- Issue and view queue tokens (with barcodes)
+- Issue and view queue tokens
 - Browse patient history
 - Daily reception dashboard
 ### 🩺 Doctor
