@@ -1,0 +1,9 @@
+
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "http://clinic-lb-645002519.ap-south-2.elb.amazonaws.com/api/:path*"
+    }
+  ]
+}

@@ -17,7 +17,7 @@ const PORT=process.env.PORT
 
 /* ---------------- MIDDLEWARES ---------------- */
 
-const allowedOrigin=["http://localhost:5173"];
+const allowedOrigin=["http://clinic-frontend-814663754819-ap-south-2-an.s3-website.ap-south-2.amazonaws.com"];
 
 app.use(cors({
     origin:allowedOrigin,
