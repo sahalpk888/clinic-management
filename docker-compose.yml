@@ -1,28 +1,31 @@
 services:
   server:
     build: ./server
-    image: clinic-server22:latest
-    container_name: clinic-server22
+    image: clinic-server:v2
+    container_name: clinic-server-v2
+    command: npm run dev   #it overrides the production "CMD npm start" to "npm run dev" to run locally
     ports:
       - "8000:8000"
     env_file:
       - ./server/.env
     volumes:
       - ./server:/app
-      - server_node_modules22:/app/node_modules
+      - server_node_modulesv2:/app/node_modules
 
   frontend:
     build: ./frontend
-    image: clinic-frontend22:latest
-    container_name: clinic-frontend22
+    image: clinic-frontend:v2
+    container_name: clinic-frontend-v2
     ports:
       - "5173:5173"
+    env_file:
+      - ./frontend/.env
     depends_on:
       - server
     volumes:
       - ./frontend:/app
-      - frontend_node_modules22:/app/node_modules
+      - frontend_node_modulesv2:/app/node_modules
 
 volumes:
-  server_node_modules22:
-  frontend_node_modules22:
+  server_node_modulesv2:
+  frontend_node_modulesv2:

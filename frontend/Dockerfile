@@ -9,15 +9,6 @@ RUN npm ci
 
 COPY . .
 
-RUN npm run build
+EXPOSE 5173
 
-
-
-# Production stage
-FROM nginx:alpine
-
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm","run","dev","--","--host","0.0.0.0"]

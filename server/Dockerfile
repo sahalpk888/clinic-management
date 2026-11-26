@@ -8,6 +8,9 @@ RUN npm ci
 
 COPY . .
 
+# for typescript
+RUN npm run build   
+
 EXPOSE 8000
 
 CMD ["npm", "start"]
