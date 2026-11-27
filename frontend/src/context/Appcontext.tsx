@@ -78,7 +78,7 @@ export const AppContextProvider = ({
    
    
    const registerStaff=async(data:FormData):Promise<void>=>{
-          const reponse=await api.post<AuthResponse>('api/clinic/registerstaff',data)
+          const reponse=await api.post<AuthResponse>('/api/clinic/registerstaff',data)
           console.log(reponse)
     }
 
@@ -87,7 +87,7 @@ export const AppContextProvider = ({
     const checkAuth=async()=>{
       try{
 
-        const res=await api.get('api/clinic/me');
+        const res=await api.get('/api/clinic/me');
         console.log(res)
          setOwner(res.data.user)
          setLogo(res.data.logo.logo.logo)

@@ -373,7 +373,7 @@ export const clinic_admindashService=async(adminId:string,clinicIdData:string)=>
 
   const [revenue]=await db 
                        .select({
-                        revenue:sum(pharmacyBill.total_amount)
+                        revenue:sql<number>`COALESCE(SUM(${pharmacyBill.total_amount}),0)`
                        })
                        .from(pharmacyBill)
                        .where(and(
@@ -385,16 +385,21 @@ export const clinic_admindashService=async(adminId:string,clinicIdData:string)=>
 
 
    const [completecount] = await db  
-                         .select({complete:count()})
+                         .select({
+                                  complete: sql<number>`count(*)`,
+                                
+                          })
                          .from(pharmacyBill)
                          .innerJoin(consultationSchema,eq(consultationSchema.id,pharmacyBill.consultId))
                          .innerJoin(patient,eq(patient.id,consultationSchema.patientId))
-                         .innerJoin(visit,eq(visit.patientId,patient.id))
+                         .innerJoin(visit,eq(visit.id,consultationSchema.visitId))
                          .where(and(
                             eq(visit.date,formatteddate),
                             eq(pharmacyBill.status,"completed"),
                             isNotNull(visit.appoitTime),
                             eq(pharmacyBill.clinicId,clinicIdData)))
+                           
+ 
 
       const revenue_chart= await db 
                                  .select({

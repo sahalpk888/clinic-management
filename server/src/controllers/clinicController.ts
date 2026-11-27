@@ -86,10 +86,10 @@ export const clinic_login=async(req:Request,res:Response)=>{
             }
         );
 
-        res.cookie("token", tokenValue, {
+         res.cookie("token", tokenValue, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none":"lax",
+            sameSite: process.env.NODE_ENV === "production"?"none":"lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: "/",
         });
@@ -102,11 +102,12 @@ export const clinic_login=async(req:Request,res:Response)=>{
 
 
     }catch(err){
-        console.log(err);
-        return res.json({
-            success:false,
-            message:"Clinic_login Failed"
-        })
+        console.error("CLINIC LOGIN ERROR:", err);
+
+    return res.status(500).json({
+        success: false,
+        message: "Clinic_login Failed"
+    });
     }
 }
 
@@ -118,8 +119,8 @@ export const clinic_logout=async(req:Request,res:Response)=>{
             res.clearCookie("token", {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                path: "/",
+                sameSite: process.env.NODE_ENV === "production"?"none":"lax",
+                path: "/"
             });
 
             return res.status(200).json({
